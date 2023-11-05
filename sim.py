@@ -113,21 +113,28 @@ def complex_to_real_vector(v):
 def real_to_complex_vector(v):
     return np.array([row[0]+row[1]*1j for row in v.reshape((v.size//2,2))])
 
+c = 4
+
 def evaluate(x, g, step):
-    x2 = real_to_complex_vector(x).reshape((n,n))
+    x2 = real_to_complex_vector(x)
+    grad_l1part = c * np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
+    x2 = x2.reshape((n,n))
+
     IFT_x = np.fft.ifft2(x2)
     SM_IFT_x = IFT_x[sampling_mask>0].reshape(signal_sampled.shape)
     remainder = SM_IFT_x - signal_sampled
-    s = np.sum(np.power(abs(remainder),2))
+    s = np.sum(np.power(abs(remainder),2)) + c*np.sum(abs(x2))
     # print(SM_IFT_x)
     # print(signal_sampled)
     # print(SM_IFT_x - signal_sampled)
     # print(np.power(abs(SM_IFT_x - signal_sampled),2))
     # print(s)
 
+    # grad_l1part = np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
+
     upsized_remainder = np.matmul(sampling_transposed_mask(sampling_mask),sig.vectorization(remainder)).reshape((n,n))
     grad = sig.vectorization(2*np.fft.ifft2(upsized_remainder))
-    grad = complex_to_real_vector(grad).reshape((grad.size*2,1))
+    grad = (complex_to_real_vector(grad) + grad_l1part.reshape(2*n**2)).reshape((grad.size*2,1))
     np.copyto(g, grad)
 
     print(s)
@@ -192,7 +199,7 @@ def evaluate(x, g, step):
 
 from pylbfgs import owlqn
 
-Xat2 = owlqn(2*n**2, evaluate, None, 0.1)
+Xat2 = owlqn(2*n**2, evaluate, None,0)
 Xat = real_to_complex_vector(Xat2).reshape(n, n) # stack columns
 Xa = np.fft.ifft2(Xat)
 
