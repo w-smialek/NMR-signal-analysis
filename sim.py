@@ -10,8 +10,8 @@ import signals as sig
 ###
 
 sampling_rate = 0.0001
-sampling_ratio = 0.4
-delta = 0.2
+sampling_ratio = 0.6
+delta = 0.1
 
 
 # n = 100
@@ -52,95 +52,111 @@ delta = 0.2
 ### 2D
 ###
 
-# n = 10
+n = 40
 
-# form2d = [[sig.sinexp(t1,1,0.3+t2*0.3/100,30)*sig.sinexp(t2,1,0.15,60) for t1 in range(n)] for t2 in range(n)]
+form2d = [[sig.sinexp(t1,1,0.3+t2*0.3/100,30)*sig.sinexp(t2,1,0.15,60) for t1 in range(n)] for t2 in range(n)]
 
-# s2 = sig.Signal2D(sampling_rate,sampling_rate)
+s2 = sig.Signal2D(sampling_rate,sampling_rate)
 
-# s2.add_signal(sig.sinexp_2d_list((0.6,0.5),(0.3,0.7),(40,50),(n,n)))
-# s2.add_signal(sig.sinexp_2d_list((0.7,0.6),(0.7,0.8),(60,60),(n,n)))
-# s2.add_signal(sig.sinexp_2d_list((0.6,0.3),(0.7,0.2),(25,45),(n,n)))
-# s2.add_signal(form2d)
-# s2.add_signal(sig.whitenoise_complex(0.15,(n,n)))
-# s2.plot2D()
-# s2.freqplot2D()
+s2.add_signal(sig.sinexp_2d_list((0.6,0.5),(0.3,0.7),(40,50),(n,n)))
+s2.add_signal(sig.sinexp_2d_list((0.7,0.6),(0.7,0.8),(60,60),(n,n)))
+s2.add_signal(sig.sinexp_2d_list((0.6,0.3),(0.7,0.2),(25,45),(n,n)))
+s2.add_signal(form2d)
+s2.add_signal(sig.whitenoise_complex(0.15,(n,n)))
+s2.plot2D()
+plt.savefig("s2.png", dpi=400)
+s2.freqplot2D()
+plt.savefig("s2freq.png", dpi=400)
+plt.close()
 
-# row_mask = np.random.choice([0,1],n,p=[1-sampling_ratio,sampling_ratio])
-# sampling_mask = np.array([np.ones(n) * r for r in row_mask])
+row_mask = np.random.choice([0,1],n,p=[1-sampling_ratio,sampling_ratio])
+sampling_mask = np.array([np.ones(n) * r for r in row_mask])
 
 # plt.matshow(sampling_mask)
 # plt.show()
 
-# s2_s, s2_p = s2.sparse_sample(sampling_mask)
+s2_sample, s2_padded = s2.sparse_sample(sampling_mask)
 
-# s2_s.plot2D()
-# s2_s.freqplot2D()
+# s2_sample.plot2D()
+# s2_sample.freqplot2D()
+# plt.show()
 
-# s2_p.plot2D()
-# s2_p.freqplot2D()
+# s2_padded.plot2D()
+# s2_padded.freqplot2D()
+# plt.show()
+
+s2_reconstructed = sig.Signal2D(sampling_rate, sampling_rate)
+signal_reconstructed = np.fft.fft2(np.flip(sig.cs_reconstruct_2d(s2_sample,sig.sampling_matrix(sig.vectorization(sampling_mask)),delta)).reshape((n,n)).T)
+s2_reconstructed.set_signal(signal_reconstructed)
+
+s2_reconstructed.plot2D()
+plt.savefig("s2rec.png", dpi=400)
+s2_reconstructed.freqplot2D()
+plt.savefig("s2recfreq.png", dpi=400)
+plt.show()
+
 
 ###
 ### 2D OWL-QN
 ###
 
-n = 50
-sampling = 1
+# n = 50
+# sampling = 1
 
-s2 = sig.Signal2D(0.001,0.001)
-s2.add_signal(sig.sinexp_2d_list((0.6,0.5),(0.3,0.7),(40,50),(n,n)))
-s2.add_signal(sig.sinexp_2d_list((0.7,0.6),(0.7,0.5),(60,60),(n,n)))
-s2.add_signal(sig.sinexp_2d_list((0.6,0.3),(0.7,0.2),(25,45),(n,n)))
-s2.add_signal(sig.whitenoise_complex(0.15,(n,n)))
-s2.plot2D()
-s2.freqplot2D()
+# s2 = sig.Signal2D(0.001,0.001)
+# s2.add_signal(sig.sinexp_2d_list((0.6,0.5),(0.3,0.7),(40,50),(n,n)))
+# s2.add_signal(sig.sinexp_2d_list((0.7,0.6),(0.7,0.5),(60,60),(n,n)))
+# s2.add_signal(sig.sinexp_2d_list((0.6,0.3),(0.7,0.2),(25,45),(n,n)))
+# s2.add_signal(sig.whitenoise_complex(0.15,(n,n)))
+# s2.plot2D()
+# s2.freqplot2D()
 
-sampling_mask = np.array([np.ones(n) if np.random.uniform(0,1)<sampling else np.zeros(n) for i in range(n)])
+# sampling_mask = np.array([np.ones(n) if np.random.uniform(0,1)<sampling else np.zeros(n) for i in range(n)])
 
-def sampling_transposed_mask(sampling_mask):
-    big_mat = np.diag(sig.vectorization(sampling_mask))
-    less_big_mat = np.array([item for item in big_mat if np.sum(item)])
-    return less_big_mat.T
+# def sampling_transposed_mask(sampling_mask):
+#     big_mat = np.diag(sig.vectorization(sampling_mask))
+#     less_big_mat = np.array([item for item in big_mat if np.sum(item)])
+#     return less_big_mat.T
 
-s2_s, s2_p = s2.sparse_sample(sampling_mask)
+# s2_s, s2_p = s2.sparse_sample(sampling_mask)
 
-signal_sampled = s2_s.timedom.form
+# signal_sampled = s2_s.timedom.form
 
-def complex_to_real_vector(v):
-    mat = np.array([[cpl.real,cpl.imag] for cpl in v])
-    return mat.reshape(2*v.size)
+# def complex_to_real_vector(v):
+#     mat = np.array([[cpl.real,cpl.imag] for cpl in v])
+#     return mat.reshape(2*v.size)
 
-def real_to_complex_vector(v):
-    return np.array([row[0]+row[1]*1j for row in v.reshape((v.size//2,2))])
+# def real_to_complex_vector(v):
+#     return np.array([row[0]+row[1]*1j for row in v.reshape((v.size//2,2))])
 
-c = 4
+# c = 4
 
-def evaluate(x, g, step):
-    x2 = real_to_complex_vector(x)
-    grad_l1part = c * np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
-    x2 = x2.reshape((n,n))
+# def evaluate(x, g, step):
+#     x2 = real_to_complex_vector(x)
+#     grad_l1part = c * np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
+#     x2 = x2.reshape((n,n))
 
-    IFT_x = np.fft.ifft2(x2)
-    SM_IFT_x = IFT_x[sampling_mask>0].reshape(signal_sampled.shape)
-    remainder = SM_IFT_x - signal_sampled
-    s = np.sum(np.power(abs(remainder),2)) + c*np.sum(abs(x2))
-    # print(SM_IFT_x)
-    # print(signal_sampled)
-    # print(SM_IFT_x - signal_sampled)
-    # print(np.power(abs(SM_IFT_x - signal_sampled),2))
-    # print(s)
+#     IFT_x = np.fft.ifft2(x2)
+#     SM_IFT_x = IFT_x[sampling_mask>0].reshape(signal_sampled.shape)
+#     remainder = SM_IFT_x - signal_sampled
+#     s = np.sum(np.power(abs(remainder),2)) + c*np.sum(abs(x2))
+#     # print(SM_IFT_x)
+#     # print(signal_sampled)
+#     # print(SM_IFT_x - signal_sampled)
+#     # print(np.power(abs(SM_IFT_x - signal_sampled),2))
+#     # print(s)
 
-    # grad_l1part = np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
+#     # grad_l1part = np.array([item/(abs(x2)[i//2]) for i, item in enumerate(x)])
 
-    upsized_remainder = np.matmul(sampling_transposed_mask(sampling_mask),sig.vectorization(remainder)).reshape((n,n))
-    grad = sig.vectorization(2*np.fft.ifft2(upsized_remainder))
-    grad = (complex_to_real_vector(grad) + grad_l1part.reshape(2*n**2)).reshape((grad.size*2,1))
-    np.copyto(g, grad)
+#     upsized_remainder = np.matmul(sampling_transposed_mask(sampling_mask),sig.vectorization(remainder)).reshape((n,n))
+#     grad = sig.vectorization(2*np.fft.ifft2(upsized_remainder))
+#     grad = (complex_to_real_vector(grad) + grad_l1part.reshape(2*n**2)).reshape((grad.size*2,1))
+#     np.copyto(g, grad)
 
-    print(s)
-    # print(grad)
+#     print(s)
+#     # print(grad)
 
-    return s
+#     return s
 
 
 
@@ -197,23 +213,23 @@ def evaluate(x, g, step):
     
 
 
-from pylbfgs import owlqn
+# from pylbfgs import owlqn
 
-Xat2 = owlqn(2*n**2, evaluate, None,0)
-Xat = real_to_complex_vector(Xat2).reshape(n, n) # stack columns
-Xa = np.fft.ifft2(Xat)
+# Xat2 = owlqn(2*n**2, evaluate, None,0)
+# Xat = real_to_complex_vector(Xat2).reshape(n, n) # stack columns
+# Xa = np.fft.ifft2(Xat)
 
-plt.matshow(Xa.real)
-plt.show()
+# plt.matshow(Xa.real)
+# plt.show()
 
-np.save("rec_sig",Xa)
+# np.save("rec_sig",Xa)
 
-arr = np.load("rec_sig.npy")
+# arr = np.load("rec_sig.npy")
 
-s2_rec = sig.Signal2D(0.001,0.001)
-s2_rec.set_signal(arr)
-s2_rec.plot2D()
-s2_rec.freqplot2D()
+# s2_rec = sig.Signal2D(0.001,0.001)
+# s2_rec.set_signal(arr)
+# s2_rec.plot2D()
+# s2_rec.freqplot2D()
 
 
 # # reconstructed_vectorized = cs_reconstruct_2d(s2_s,sampl_mat, delta)

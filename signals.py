@@ -175,14 +175,16 @@ class Signal2D(Signal):
 
     def plot2D(self):
         plt.imshow(self.timedom.real(), interpolation='none')
-        plt.show()
+        plt.xlabel("direct dimension [%s s]"%self.dt1)
+        plt.ylabel("indirect dimension [%s s]"%self.dt2)
+        # plt.show()
 
     def freqplot2D(self):
         fig = plt.figure(figsize=(6, 6))
         ax1 = fig.add_subplot(projection='3d')
 
-        x = np.arange(np.shape(self.timedom.form)[1])
-        y = np.arange(self.len)
+        x = np.arange(np.shape(self.timedom.form)[1])/self.len/self.dt1
+        y = np.arange(self.len)/self.len/self.dt1
         x, y = np.meshgrid(x, y)
 
         # x = [i%self.len for i in range(self.len**2)]
@@ -197,6 +199,9 @@ class Signal2D(Signal):
         # ax1.bar3d(x, y, 0, 1, 1, dz, shade=True, color=colors)
 
         ax1.plot_surface(x,y,self.freqdom.form,cmap=matplotlib.cm.seismic,linewidth=0,antialiased=True)
+        plt.xlabel("direct dimension [Hz]")
+        plt.ylabel("indirect dimension [Hz]")
+
 
         # plt.imshow(self.freqdom.real(), interpolation='none')
-        plt.show()
+        # plt.show()
