@@ -7,6 +7,11 @@ import scipy.fftpack as fpack
 ###
 ### Functions
 ###
+def f2axes(freq):
+    n, m = freq.shape
+    # print(freq)
+    return np.flip(np.roll(freq,(n//2,n//2),(0,1)),0)
+###
 
 def sinexp(x,ampl,freq,tau):
     return ampl*np.exp(x*(2*np.pi*freq*1j - 1/tau))
@@ -67,6 +72,7 @@ class Waveform:
     def __init__(self,l):
         self.form = np.array(l)
         self.size = self.form.size
+        self.shape = self.form.shape
 
     def real(self):
         return np.real(self.form)
@@ -75,12 +81,12 @@ class Waveform:
         return np.imag(self.form)
     
     def ft(self):
-        return Waveform(np.fft.fft(self.form))
+        return Waveform(np.fft.rfft(self.form))
     
 class Waveform2D(Waveform):
 
     def ft(self):
-        return Waveform2D(np.fft.fft2(self.form))
+        return Waveform2D(f2axes(np.fft.fft2(self.form)))
     
     def n_dir(self):
         return np.shape(self.form)[0]
@@ -90,10 +96,11 @@ class Waveform2D(Waveform):
     
     
 class Signal:
-    def __init__(self,delta1):
+    def __init__(self,l,delta1=1):
         self.dt1 = delta1
-        self.timedom = None
-        self.len = 0
+        self.timedom = Waveform(l)
+        self.len = self.timedom.shape[0]
+        self.update()
 
     def update(self):
         self.freqdom = self.timedom.ft()
@@ -134,9 +141,12 @@ class Signal:
             # plt.show()
 
 class Signal2D(Signal):
-    def __init__(self, delta1, delta2):
-        super().__init__(delta1)
+    def __init__(self,l, delta1=1, delta2=1):
+        self.dt1 = delta1
         self.dt2 = delta2
+        self.timedom = Waveform2D(l)
+        self.len = self.timedom.shape[0]
+        self.update()
 
     def set_signal(self, signal):
         self.timedom = Waveform2D(signal)
@@ -147,13 +157,10 @@ class Signal2D(Signal):
         dir_sl.set_signal(self.timedom.form[indirect_t,:])
         return dir_sl
     
-    def set_direct_slice(self,l,indirect_t):
-        self.timedom.form[indirect_t,:] = np.array(l)
-        self.update()
-    
-    def add_direct_slice(self,l,indirect_t):
-        self.timedom.form[indirect_t,:] += np.array(l)
-        self.update()
+    def indirect_slice(self,direct_t):
+        dir_sl = Signal(self.dt1)
+        dir_sl.set_signal(self.timedom.form[:,direct_t])
+        return dir_sl
 
     def sparse_sample(self, sampling_mask):
         l = np.shape(self.timedom.form)[0]
@@ -181,27 +188,31 @@ class Signal2D(Signal):
 
     def freqplot2D(self):
         fig = plt.figure(figsize=(6, 6))
-        ax1 = fig.add_subplot(projection='3d')
 
-        x = np.arange(np.shape(self.timedom.form)[1])/self.len/self.dt1
-        y = np.arange(self.len)/self.len/self.dt1
-        x, y = np.meshgrid(x, y)
-
-        # x = [i%self.len for i in range(self.len**2)]
-        # y = [i//self.len for i in range(self.len**2)]
-        # dz = [self.freqdom.form[i//self.len,i%self.len].real for i in range(self.len**2)]
-
-        # offset = dz + np.abs(min(dz))
-        # fracs = (offset.astype(float)/max(offset))**(1/2)
-        # norm = matplotlib.colors.Normalize(fracs.min(), fracs.max())
-        # colors = matplotlib.cm.jet(norm(fracs))
-
-        # ax1.bar3d(x, y, 0, 1, 1, dz, shade=True, color=colors)
-
-        ax1.plot_surface(x,y,self.freqdom.form,cmap=matplotlib.cm.seismic,linewidth=0,antialiased=True)
+        # ax1 = fig.add_subplot(projection='3d')
+        # x = np.arange(np.shape(self.timedom.form)[1])/self.len/self.dt1
+        # y = np.arange(self.len)/self.len/self.dt1
+        # x, y = np.meshgrid(x, y)
+        # ax1.plot_surface(x,y,self.freqdom.form,cmap=matplotlib.cm.seismic,linewidth=0,antialiased=True)
+            
+        ax1 = fig.add_subplot()
+        ff = abs(self.freqdom.form)
+        ax1.imshow(ff)
         plt.xlabel("direct dimension [Hz]")
         plt.ylabel("indirect dimension [Hz]")
 
+        #     ax1 = fig.add_subplot()
+        #     ff = self.freqdom.form.real
+        #     r = 1-np.heaviside(ff-np.max(ff)*0.05,1)*ff/np.max(ff)
+        #     g = 1-np.heaviside(-ff+np.max(ff)*0.05,1)*ff/np.min(ff)
+        #     b = np.ones(r.shape)
+        #     rgb = np.transpose(np.array([r,g,b]),[1,2,0])
+
+        #     ax1.imshow(rgb)
+
+        #     plt.xlabel("direct dimension [Hz]")
+        #     plt.ylabel("indirect dimension [Hz]")
+
 
         # plt.imshow(self.freqdom.real(), interpolation='none')
-        # plt.show()
+        plt.show()
