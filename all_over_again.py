@@ -16,6 +16,10 @@ def colorize(z):
     c = c.swapaxes(0,2) 
     return c
 
+def waveform2(n, F, t_indir):
+    '''t_indir - indirect time values in terms of real time'''
+    return np.array([[F(t1,t2,treal) for t1 in range(n)] for t2, treal in zip(t_indir,range(n))])
+
 class Signal():
     def __init__(self, form=np.array([0])):
         self.timedom = np.array(form)
@@ -24,11 +28,21 @@ class Signal():
         self.dim = len(self.shape)
         self.freqdom = np.fft.fft2(self.timedom,None,[i for i in range(self.dim)])
 
+    def update(self):
+        self.freqdom = np.fft.fft2(self.timedom,None,[i for i in range(self.dim)])
+
     def add(self,form):
         if self.timedom.any():
             self.timedom = form
             return
         self.timedom += form
+
+    def deshuffle(self,t_indir):
+        inverse_perm = np.empty_like(t_indir)
+        inverse_perm[t_indir] = np.arange(t_indir.size)
+        self.timedom = self.timedom[inverse_perm]
+        self.update()
+
     
     def plot(self, type="time"):
         if type == "time":
@@ -45,13 +59,32 @@ class Signal():
             plt.show()
 
 
-n = 100
+n = 500
 
-form = [[np.exp(2j*pi*(t1*(0.1+t2*0.1/n)+t2*(0.3+t2/n*0.1))) for t1 in range(n)] for t2 in range(n)]
+def non_stationary_frequency(t1,t2,treal):
+    f1, f2 = 0.1*treal/n , 0.1*treal/n
+    tau1, tau2 = n/2, n/2
+    return np.exp(2j*pi*(f1*t1+f2*t2))
+
+t_indir = np.random.choice(n,n,replace=False)
+
+signal_lin = Signal(waveform2(n,non_stationary_frequency,range(n)))
+signal_perp = Signal(waveform2(n,non_stationary_frequency,t_indir))
 
 
-signal = Signal()
+signal_lin.plot("time")
+signal_lin.plot("freq")
 
-signal.plot("time")
-signal.plot("freq")
+signal_perp.deshuffle(t_indir)
+signal_perp.plot("time")
+signal_perp.plot("freq")
 
+###
+### Time-resolved NUS
+###
+
+def snapshot_2d(n, F, treal, t_indir):
+    '''n - number of direct time datapoints \n
+    treal - range of real time values \n
+    t_indir - corresponding indirect time values'''
+    
