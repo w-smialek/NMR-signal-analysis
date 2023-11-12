@@ -17,6 +17,10 @@ def colorize(z):
     c = c.swapaxes(0,2) 
     return c
 
+def whitenoise_complex(stdev,shape):
+    rng = np.random.default_rng()
+    return rng.normal(0,stdev/2,shape) + 1j* rng.normal(0,stdev/2,shape)
+
 def waveform2(n, F, t_indir):
     '''t_indir - indirect time values in terms of real time'''
     form = np.zeros((n,n)).astype(complex)
@@ -36,17 +40,19 @@ class Signal():
         self.freqdom = np.fft.fft2(self.timedom,None,[i for i in range(self.dim)])
 
     def add(self,form):
-        if self.timedom.any():
+        if not self.timedom.any():
             self.timedom = form
+            self.update()
             return
         self.timedom += form
-
-    def deshuffle(self,t_indir):
-        inverse_perm = np.empty_like(t_indir)
-        inverse_perm[t_indir] = np.arange(t_indir.size)
-        self.timedom = self.timedom[inverse_perm]
         self.update()
 
+    def deshuffle(self,t_indir):
+        self.timedom = self.timedom[np.argsort(t_indir)]
+        # inverse_perm = np.empty_like(t_indir)
+        # inverse_perm[t_indir] = np.arange(t_indir.size)
+        # self.timedom = self.timedom[inverse_perm]
+        self.update()
 
     def plot(self, type="time"):
         if type == "time":
@@ -62,31 +68,31 @@ class Signal():
                 plt.imshow(abs(self.freqdom))
             plt.show()
 
-n = 30
+n = 20
 
 ###
 ### Effects of non-stationary frequency
 ###
 
+# # def non_stationary_frequency(t1,t2,treal):
+# #     f1, f2 = 0.1+0.02*treal/n , 0.2 + 0.02*treal/n
+# #     tau1, tau2 = n/2, n/2
+# #     return np.exp(2j*pi*(f1*t1+f2*t2))
+
 # def non_stationary_frequency(t1,t2,treal):
-#     f1, f2 = 0.1+0.02*treal/n , 0.2 + 0.02*treal/n
+#     f1, f2 = 0.1, 0.2
+#     f3, f4 = 0.3, 0.6
 #     tau1, tau2 = n/2, n/2
-#     return np.exp(2j*pi*(f1*t1+f2*t2))
+#     return np.exp(2j*pi*(f1*t1+f2*t2)-t1/tau1) + np.exp(2j*pi*(f3*t1+f4*t2)-t1/tau2)
 
-def non_stationary_frequency(t1,t2,treal):
-    f1, f2 = 0.1, 0.2
-    f3, f4 = 0.3, 0.6
-    tau1, tau2 = n/2, n/2
-    return np.exp(2j*pi*(f1*t1+f2*t2)-t1/tau1) + np.exp(2j*pi*(f3*t1+f4*t2)-t1/tau2)
+# t_indir = np.random.choice(n,n,replace=False)
 
-t_indir = np.random.choice(n,n,replace=False)
+# signal_lin = Signal(waveform2(n,non_stationary_frequency,range(n)))
 
-signal_lin = Signal(waveform2(n,non_stationary_frequency,range(n)))
+# signal_perp = Signal(waveform2(n,non_stationary_frequency,t_indir))
 
-signal_perp = Signal(waveform2(n,non_stationary_frequency,t_indir))
-
-# signal_lin.plot("freq")
-# signal_perp.plot("freq")
+# # signal_lin.plot("freq")
+# # signal_perp.plot("freq")
 
 ###
 ### Time-resolved NUS
@@ -134,7 +140,7 @@ signal_perp = Signal(waveform2(n,non_stationary_frequency,t_indir))
 
 
 ###
-### CS reconstruction and NUS - non-stationarity compromise
+### CS reconstruction
 ###
 
 ### 1D
@@ -208,30 +214,169 @@ def cs_reconstruct_2d(sig_sampled,sampling_matricized,delta):
 # def non_stationary_frequency(t1,t2,treal):
 #     f1, f2 = 0.1+0.02*treal/n , 0.2 + 0.02*treal/n
 #     tau1, tau2 = n/2, n/2
-#     return np.exp(2j*pi*(f1*t1+f2*t2))
+#     return np.exp(2j*pi*(f1*t1+f2*t2)-t1/(tau1)-t2/(tau2))
+
+# # def non_stationary_frequency(t1,t2,treal):
+# #     f1, f2 = 0.1, 0.2
+# #     f3, f4 = 0.3, 0.6
+# #     tau1, tau2 = n/2, n/2
+# #     return np.exp(2j*pi*(f1*t1+f2*t2)-t1/tau1) + np.exp(2j*pi*(f3*t1+f4*t2)-t1/tau2)
+
+
+# sig = waveform2(n,non_stationary_frequency,range(n))
+# signal = Signal(sig)
+
+# signal.plot("freq")
+
+# sampling_rows = np.random.choice([0,1],n,replace=True,p=(1-sampling_ratio, sampling_ratio))
+# sampling_mask = np.array([np.ones(n) if ifrow else np.zeros(n) for ifrow in sampling_rows])
+
+# sampling_mat = sampling_matrix(vectorization(sampling_mask))
+
+# sig_sam = sig[sampling_mask.astype(bool)].reshape((np.count_nonzero(sampling_rows),n))
+# signal_sampled = Signal(sig_sam)
+
+# print(type(signal_sampled.timedom[0,0]))
+
+# x = cs_reconstruct_2d(signal_sampled,sampling_mat,0.1)
+
+# signal_rec = Signal(np.fft.ifft2(x.reshape((n,n)).T))
+# signal_rec.plot("time")
+# signal_rec.plot("freq")
+
+###
+### NUS - non-stationarity compromise
+###
+
+### 1D
+
+# def waveform(F, t_real, t_sampled):
+#     return [F(t_r,t_s) for t_r, t_s in zip(t_real, t_sampled)]
+
+# def non_stat_freq(t_r, t_s):
+#     a1, a2 = 2, 1
+#     f1, f2 = 0.2 + 0.015*t_r/n, 0.5 + 0.015*t_r/n
+#     tau1, tau2 = n/3, n/3
+#     return a1*np.exp(2j*pi*t_s*f1 -t_s/tau1) + a2*np.exp(2j*pi*t_s*f2 -t_s/tau2)
+
+# sig = Signal(waveform(non_stat_freq,range(n),range(n)))
+# sig.add(whitenoise_complex(0.2,n))
+# sig.plot(type="time")
+# sig.plot(type="freq")
+
+# for i in [0.1,0.2,0.25,0.33,0.5,0.99]:
+#     sampling_ratio = i
+#     mask = np.zeros(n)
+#     filter = np.random.choice(np.arange(n),int(sampling_ratio*n),replace=False)
+#     mask[filter] = 1
+
+#     form = waveform(non_stat_freq, range(int(n*sampling_ratio)), filter)
+
+#     sig_sampled = Signal(form)
+#     sig_sampled.deshuffle(filter)
+#     # sig_sampled.plot(type="time")
+#     # sig_sampled.plot(type="freq")
+#     plt.show()
+    
+#     a = np.fft.ifft(cs_reconstruct_1d(sig_sampled, sampling_matrix(mask), 1*sig_sampled.len/n))
+
+#     if i ==0.99:
+#         sig_rec = Signal(a)
+#     else:
+#         sig_rec = Signal(a)
+#     # sig_rec.plot(type="time")
+#     sig_rec.plot(type="freq")
+#     plt.plot(sig_rec.freqdom)
+#     plt.savefig("fig%s.png"%(int(i*100)),dpi=300)
+#     plt.close()
+
+### 2D
 
 def non_stationary_frequency(t1,t2,treal):
-    f1, f2 = 0.1, 0.2
-    f3, f4 = 0.3, 0.6
+    f1, f2 = 0.2+0.05*treal/n, 0.4+0.05*treal/n
     tau1, tau2 = n/2, n/2
-    return np.exp(2j*pi*(f1*t1+f2*t2)-t1/tau1) + np.exp(2j*pi*(f3*t1+f4*t2)-t1/tau2)
+    return np.exp(2j*pi*(f1*t1+f2*t2))#-t1/(tau1)-t2/(tau2))
 
+def snapshot_2d(n, F, t_real, t_indir):
+    '''n - number of direct time datapoints \n
+    treal - range of real time values \n
+    t_indir - corresponding indirect time values'''
+    form = np.zeros((n,n)).astype(complex)
+    for t2, tr in zip(t_indir, t_real):
+        form[t2,:] = np.array([F(t1,t2,tr) for t1 in range(n)])
+    return form[t_indir]
 
-sig = waveform2(n,non_stationary_frequency,range(n))
-signal = Signal(sig)
+sig_original = Signal(snapshot_2d(n,non_stationary_frequency,range(n),range(n)))
+sig_original.plot()
+sig_original.plot("freq")
 
-signal.plot("freq")
+n_snapshots = 10
+t_r_length = 5
 
-sampling_rows = np.random.choice([0,1],n,replace=True,p=(1-sampling_ratio, sampling_ratio))
-sampling_mask = np.array([np.ones(n) if ifrow else np.zeros(n) for ifrow in sampling_rows])
+sampling_ratio = t_r_length/n
 
-sampling_mat = sampling_matrix(vectorization(sampling_mask))
+for i in range(n_snapshots):
+    t_r_schedule = np.random.choice(np.arange(i*t_r_length,(i+1)*t_r_length),t_r_length,replace=False)
 
-sig_sam = sig[sampling_mask.astype(bool)].reshape((np.count_nonzero(sampling_rows),n))
-signal_sampled = Signal(sig_sam)
+    filter = np.random.choice(np.arange(n),int(n*sampling_ratio),replace=False)
+    mask = np.zeros((n,n))
+    mask[filter] = np.ones(n)
+    sampling_mat = sampling_matrix(vectorization(mask))
 
-x = cs_reconstruct_2d(signal_sampled,sampling_mat,0.1)
+    sig_padded = np.zeros((n,n)).astype(complex)
+    for t2, treal in zip(filter, t_r_schedule):
+        sig_padded[t2,:] = [non_stationary_frequency(t1,t2,treal) for t1 in range(n)]
 
-signal_rec = Signal(np.fft.fft2(np.flip(x.reshape((n,n)),(0,1))))
-signal_rec.plot("time")
-signal_rec.plot("freq")
+    sig_subsampled = sig_padded[mask.astype(bool)].reshape((filter.size,n))
+
+    sig_padded = Signal(sig_padded)
+    sig_subsampled = Signal(sig_subsampled)
+    sig_padded.plot()
+    sig_subsampled.plot()
+
+    sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1)
+    sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
+
+    sig_reconstructed.plot("freq")
+
+###
+### 2D time-resolved NUS with CS reconstruction
+###
+
+# def average_over_neighbours(array):
+#     ars = [np.roll(array,t,(0,1)) for t in [(-1,0),(0,-1),(0,0),(0,1),(1,0),(-1,-1),(1,1),(-1,1),(1,-1)]]
+#     return sum(ars)
+
+# n_snapshots = 10
+# treal_interval = 10
+
+# snaphot_sampling_ratio = treal_interval/n
+
+# snapshots = []
+# masks = []
+# for i in range(n_snapshots):
+#     t_real_interval = (int(treal_interval*i),int(treal_interval*(i+1)))
+#     t_indir = np.random.choice(n,int(n*snaphot_sampling_ratio),replace=False)
+#     ss = Signal(snapshot_2d(n,non_stationary_frequency,range(*t_real_interval),t_indir))
+#     ss.deshuffle(t_indir)
+#     mask = np.array([np.ones(n) if (i in t_indir) else np.zeros(n) for i in range(n)])
+#     masks.append(mask)
+#     snapshots.append(ss)
+
+# maxes = []
+# recs = []
+
+# for snap, mask in zip(snapshots,masks):
+#     snap.plot(type="freq")
+#     x = cs_reconstruct_2d(snap,sampling_matrix(vectorization(mask)),1)
+#     rec = Signal(np.fft.ifft2(x.reshape((n,n))).T)
+#     rec.plot("freq")
+#     recs.append(rec)
+#     maxes.append(np.argmax(rec.freqdom))
+
+# mm = np.zeros((n,n))
+# for m in maxes:
+#     mm[(m//n,m%n)] = 1
+
+# plt.imshow(mm)
+# plt.show()
