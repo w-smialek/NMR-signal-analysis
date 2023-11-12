@@ -68,7 +68,7 @@ class Signal():
                 plt.imshow(abs(self.freqdom))
             plt.show()
 
-n = 20
+n = 40
 
 ###
 ### Effects of non-stationary frequency
@@ -309,16 +309,18 @@ def snapshot_2d(n, F, t_real, t_indir):
 sig_original = Signal(snapshot_2d(n,non_stationary_frequency,range(n),range(n)))
 sig_original.plot()
 sig_original.plot("freq")
+plt.matshow(sig_original.freqdom.real)
+plt.savefig("2d_orig.png",dpi=300)
+plt.close()
 
-n_snapshots = 10
 t_r_length = 5
 
 sampling_ratio = t_r_length/n
 
-for i in range(n_snapshots):
-    t_r_schedule = np.random.choice(np.arange(i*t_r_length,(i+1)*t_r_length),t_r_length,replace=False)
+for i in [0.1,0.2,0.25,0.33,0.5,0.99]:
+    t_r_schedule = np.random.choice(np.arange(int(n*i)),int(n*i),replace=False)
 
-    filter = np.random.choice(np.arange(n),int(n*sampling_ratio),replace=False)
+    filter = np.random.choice(np.arange(n),int(n*i),replace=False)
     mask = np.zeros((n,n))
     mask[filter] = np.ones(n)
     sampling_mat = sampling_matrix(vectorization(mask))
@@ -331,13 +333,44 @@ for i in range(n_snapshots):
 
     sig_padded = Signal(sig_padded)
     sig_subsampled = Signal(sig_subsampled)
-    sig_padded.plot()
-    sig_subsampled.plot()
+    # sig_padded.plot()
+    # sig_subsampled.plot()
 
-    sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1)
+    sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1*i)
     sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
 
     sig_reconstructed.plot("freq")
+    plt.matshow(sig_reconstructed.freqdom.real)
+    plt.savefig("2d_reconstr_%s.png"%(int(i*100)),dpi=300)
+
+# n_snapshots = 10
+# t_r_length = 5
+
+# sampling_ratio = t_r_length/n
+
+# for i in range(n_snapshots):
+#     t_r_schedule = np.random.choice(np.arange(i*t_r_length,(i+1)*t_r_length),t_r_length,replace=False)
+
+#     filter = np.random.choice(np.arange(n),int(n*sampling_ratio),replace=False)
+#     mask = np.zeros((n,n))
+#     mask[filter] = np.ones(n)
+#     sampling_mat = sampling_matrix(vectorization(mask))
+
+#     sig_padded = np.zeros((n,n)).astype(complex)
+#     for t2, treal in zip(filter, t_r_schedule):
+#         sig_padded[t2,:] = [non_stationary_frequency(t1,t2,treal) for t1 in range(n)]
+
+#     sig_subsampled = sig_padded[mask.astype(bool)].reshape((filter.size,n))
+
+#     sig_padded = Signal(sig_padded)
+#     sig_subsampled = Signal(sig_subsampled)
+#     sig_padded.plot()
+#     sig_subsampled.plot()
+
+#     sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1)
+#     sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
+
+#     sig_reconstructed.plot("freq")
 
 ###
 ### 2D time-resolved NUS with CS reconstruction
