@@ -293,7 +293,7 @@ def cs_reconstruct_2d(sig_sampled,sampling_matricized,delta):
 ### 2D
 
 def non_stationary_frequency(t1,t2,treal):
-    f1, f2 = 0.2+0.05*treal/n, 0.4+0.05*treal/n
+    f1, f2 = 0.2+0.02*treal/n, 0.4+0.02*treal/n
     tau1, tau2 = n/2, n/2
     return np.exp(2j*pi*(f1*t1+f2*t2))#-t1/(tau1)-t2/(tau2))
 
@@ -317,31 +317,31 @@ t_r_length = 5
 
 sampling_ratio = t_r_length/n
 
-for i in [0.1,0.2,0.25,0.33,0.5,0.99]:
-    t_r_schedule = np.random.choice(np.arange(int(n*i)),int(n*i),replace=False)
+# for i in [0.1,0.2,0.25,0.33,0.5,0.99]:
+#     t_r_schedule = np.random.choice(np.arange(int(n*i)),int(n*i),replace=False)
 
-    filter = np.random.choice(np.arange(n),int(n*i),replace=False)
-    mask = np.zeros((n,n))
-    mask[filter] = np.ones(n)
-    sampling_mat = sampling_matrix(vectorization(mask))
+#     filter = np.random.choice(np.arange(n),int(n*i),replace=False)
+#     mask = np.zeros((n,n))
+#     mask[filter] = np.ones(n)
+#     sampling_mat = sampling_matrix(vectorization(mask))
 
-    sig_padded = np.zeros((n,n)).astype(complex)
-    for t2, treal in zip(filter, t_r_schedule):
-        sig_padded[t2,:] = [non_stationary_frequency(t1,t2,treal) for t1 in range(n)]
+#     sig_padded = np.zeros((n,n)).astype(complex)
+#     for t2, treal in zip(filter, t_r_schedule):
+#         sig_padded[t2,:] = [non_stationary_frequency(t1,t2,treal) for t1 in range(n)]
 
-    sig_subsampled = sig_padded[mask.astype(bool)].reshape((filter.size,n))
+#     sig_subsampled = sig_padded[mask.astype(bool)].reshape((filter.size,n))
 
-    sig_padded = Signal(sig_padded)
-    sig_subsampled = Signal(sig_subsampled)
-    # sig_padded.plot()
-    # sig_subsampled.plot()
+#     sig_padded = Signal(sig_padded)
+#     sig_subsampled = Signal(sig_subsampled)
+#     # sig_padded.plot()
+#     # sig_subsampled.plot()
 
-    sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1*i)
-    sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
+#     sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.1*i)
+#     sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
 
-    sig_reconstructed.plot("freq")
-    plt.matshow(sig_reconstructed.freqdom.real)
-    plt.savefig("2d_reconstr_%s.png"%(int(i*100)),dpi=300)
+#     sig_reconstructed.plot("freq")
+#     plt.matshow(sig_reconstructed.freqdom.real)
+#     plt.savefig("2d_reconstr_%s.png"%(int(i*100)),dpi=300)
 
 # n_snapshots = 10
 # t_r_length = 5
@@ -375,6 +375,52 @@ for i in [0.1,0.2,0.25,0.33,0.5,0.99]:
 ###
 ### 2D time-resolved NUS with CS reconstruction
 ###
+
+def non_stationary_frequency(t1,t2,treal):
+    f1, f2 = 0.2+0.015*treal/n, 0.4+0.015*treal/n
+    tau1, tau2 = n/2, n/2
+    return np.exp(2j*pi*(f1*t1+f2*t2))#-t1/(tau1)-t2/(tau2))
+
+def snapshot_2d(n, F, t_real, t_indir):
+    '''n - number of direct time datapoints \n
+    treal - range of real time values \n
+    t_indir - corresponding indirect time values'''
+    form = np.zeros((n,n)).astype(complex)
+    for t2, tr in zip(t_indir, t_real):
+        form[t2,:] = np.array([F(t1,t2,tr) for t1 in range(n)])
+    return form[t_indir]
+
+sampling_ratio = 0.3
+t_r_length = int(sampling_ratio*n)
+
+n_samples = 10
+
+for i in range(n):
+    t_r_schedule = np.random.choice(np.arange(int(t_r_length*i),int(t_r_length*(i+1))),t_r_length,replace=False)
+    filter = np.random.choice(np.arange(n),t_r_length,replace=False)
+    mask = np.zeros((n,n))
+    mask[filter] = np.ones(n)
+    sampling_mat = sampling_matrix(vectorization(mask))
+
+    sig_padded = np.zeros((n,n)).astype(complex)
+    for t2, treal in zip(filter, t_r_schedule):
+        sig_padded[t2,:] = [non_stationary_frequency(t1,t2,treal) for t1 in range(n)]
+
+    sig_subsampled = sig_padded[mask.astype(bool)].reshape((filter.size,n))
+
+    sig_padded = Signal(sig_padded)
+    sig_subsampled = Signal(sig_subsampled)
+    # sig_padded.plot()
+    # sig_subsampled.plot()
+
+    sig_reconstructed = cs_reconstruct_2d(sig_subsampled,sampling_mat,0.6)
+    sig_reconstructed = Signal(np.fft.ifft2(sig_reconstructed.reshape((n,n)).T))
+
+    # sig_reconstructed.plot("freq")
+    plt.matshow(sig_reconstructed.freqdom.real)
+    plt.savefig("2d_TS1_%s.png"%(int(i*100)),dpi=300)
+    plt.close()
+
 
 # def average_over_neighbours(array):
 #     ars = [np.roll(array,t,(0,1)) for t in [(-1,0),(0,-1),(0,0),(0,1),(1,0),(-1,-1),(1,1),(-1,1),(1,-1)]]
