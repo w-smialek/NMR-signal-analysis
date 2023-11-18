@@ -1,35 +1,124 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import cvxpy as cp
-import matplotlib
-import scipy.fftpack as fpack
+import matplotlib as mpl
 
-###
-### Functions
-###
-def f2axes(freq):
-    n, m = freq.shape
-    # print(freq)
-    return np.flip(np.roll(freq,(n//2,n//2),(0,1)),0)
-###
+def average_over_neighbours(array):
+    ars = [np.roll(array,t,(0,1)) for t in [(-1,0),(0,-1),(0,0),(0,1),(1,0),(-1,-1),(1,1),(-1,1),(1,-1)]]
+    return sum(ars)
 
-def sinexp(x,ampl,freq,tau):
-    return ampl*np.exp(x*(2*np.pi*freq*1j - 1/tau))
+newcolors = np.array([[1,0,0,1-np.exp(-i/150)] for i in range(256)])
+newcmp = mpl.colors.ListedColormap(newcolors)
 
-def whitenoise_complex(stdev,n):
+def whitenoise_complex(stdev,shape):
     rng = np.random.default_rng()
-    return rng.normal(0,stdev/2,n) + 1j* rng.normal(0,stdev/2,n)
+    return rng.normal(0,stdev/2,shape) + 1j* rng.normal(0,stdev/2,shape)
 
-def sinexp_2d_list(ampls,freqs,taus,ns):
-    return [[sinexp(t1,ampls[0],freqs[0],taus[0])*sinexp(t2,ampls[1],freqs[1],taus[1]) for t1 in range(ns[0])] for t2 in range(ns[1])]
+def waveform2(n, F, t_indir):
+    '''t_indir - indirect time values in terms of real time'''
+    form = np.zeros((n,n)).astype(complex)
+    for t2, tr in zip(t_indir, range(n)):
+        form[t2,:] = np.array([F(t1,t2,tr) for t1 in range(n)])
+    return form
+
+class Signal():
+    def __init__(self, form=np.array([0])):
+        self.timedom = np.array(form)
+        self.shape = self.timedom.shape
+        self.len = self.shape[0]
+        self.dim = len(self.shape)
+        self.freqdom = np.fft.fft2(self.timedom,None,[i for i in range(self.dim)])
+        self.dt1 = 1/self.len
+        self.dt2 = 1/self.len
+
+    def update(self):
+        self.freqdom = np.fft.fft2(self.timedom,None,[i for i in range(self.dim)])
+
+    def add(self,form):
+        if not self.timedom.any():
+            self.timedom = form
+            self.update()
+            return
+        self.timedom += form
+        self.update()
+
+    def deshuffle(self,t_indir):
+        self.timedom = self.timedom[np.argsort(t_indir)]
+        # inverse_perm = np.empty_like(t_indir)
+        # inverse_perm[t_indir] = np.arange(t_indir.size)
+        # self.timedom = self.timedom[inverse_perm]
+        self.update()
+
+    def plot(self, type="time", **kwargs):
+        fig = plt.figure(figsize=(6, 6))
+        ax1 = fig.add_subplot()
+        times_axis1 = np.array([self.dt1*i for i in range(self.len)])
+        try:
+            times_axis2 = np.array([self.dt2*i for i in range(self.timedom.shape[1])])
+        except:
+            pass
+        freq_axis1 = np.array([1/(self.len*self.dt1)*i for i in range(self.len)])
+        try:
+            freq_axis2 = np.array([1/(self.len*self.dt2)*i for i in range(self.timedom.shape[1])])
+        except:
+            pass
+        if type == "time":
+            if self.dim == 1:
+                plt.xlabel("time [s]")
+                plt.plot(times_axis1, self.timedom.real, **kwargs)
+            else:
+                plt.imshow(self.timedom.real, **kwargs)
+            # plt.show()
+        if type == "freq":
+            if self.dim == 1:
+                ax1.set_ylim([-40, 270])
+                plt.xlabel("frequency [Hz]")
+                ax1.plot(freq_axis1,self.freqdom.real, **kwargs)
+            else:
+                # ax1.matshow(np.flip(average_over_neighbours(self.freqdom[int(1024*0.10):int(1024*0.30),int(1024*0.0):int(1024*0.2)].real),0), extent=[freq_axis1[-1]*0.00,freq_axis1[-1]*0.2,freq_axis2[-1]*0.10,freq_axis2[-1]*0.30], **kwargs)
+                # ax1.tick_params(labeltop=False,top=False,bottom=True,labelbottom=True)
+                # plt.xlabel("frequency [Hz]")
+                # plt.ylabel("frequency [Hz]")
+
+                # ax1.matshow(np.flip(self.freqdom.real,0), extent=[freq_axis1[0],freq_axis1[-1],freq_axis2[0],freq_axis2[-1]], **kwargs)
+                # ax1.tick_params(labeltop=False,top=False,bottom=True,labelbottom=True)
+                # plt.xlabel("direct frequency [Hz]")
+                # plt.ylabel("indirect frequency [Hz]")
+
+                fig = plt.figure(figsize=(6, 6))
+                ax1 = fig.add_subplot(projection='3d')
+                x = np.arange(np.shape(self.timedom)[1])/self.len/self.dt1
+                y = np.arange(self.len)/self.len/self.dt2
+                x, y = np.meshgrid(x, y)
+                ax1.set_zlim([-10, 1000])
+                plt.xlabel("direct frequency [Hz]")
+                plt.ylabel("indirect frequency [Hz]")
+                ax1.plot_surface(x,y,abs(self.freqdom),cmap=newcmp,linewidth=0,antialiased=True)
+
+            # plt.show()
+
+def sampling_matrix(sampling_mask):
+    '''rectangular sampling matrix from a vector 0 or 1 sampling mask'''
+    sampling_mat = np.array([row for row in np.diag(sampling_mask) if np.sum(row) == True])
+    return sampling_mat
+
+def vectorization(matrix):
+    '''flattening of a 2d array'''
+    n,m = np.shape(matrix)
+    return np.array([matrix[i//m,i%m] for i in range(n*m)])
+
+def matricization(tensor):
+    '''2d matrix from a 4d tensor'''
+    a,b,c,d = np.shape(tensor)
+    return np.array([[tensor[j%a,j//a,i//d,i%d] for i in range(c*d)] for j in range(a*b)])
 
 def cs_reconstruct_1d(sig_sampled,sampling_matrix,delta):
     l = np.shape(sampling_matrix)[1]
-    print(l)
-    sig_sampled = sig_sampled.timedom.form
+    sig_sampled = sig_sampled.timedom
     ift_matrix = np.fromfunction(lambda w, k: 1/l*np.exp(2*np.pi*1j/l*w*k),(l,l))
     x = cp.Variable(l, complex=True)
     objective = cp.Minimize(cp.norm(x,1))
+    print(sig_sampled.shape, sampling_matrix.shape, ift_matrix.shape)
     constraints = [cp.abs(sampling_matrix@ift_matrix@x - sig_sampled) <= delta]
     prob = cp.Problem(objective, constraints)
     result = prob.solve(verbose=True)
@@ -38,7 +127,7 @@ def cs_reconstruct_1d(sig_sampled,sampling_matrix,delta):
 def cs_reconstruct_2d(sig_sampled,sampling_matricized,delta):
     l = int(np.sqrt(np.shape(sampling_matricized)[1]))
     print(l)
-    sig_sampled = sig_sampled.timedom.form
+    sig_sampled = sig_sampled.timedom
     sig_sampled_vectorized = vectorization(sig_sampled)
     ift_tensor = np.fromfunction(lambda t1, t2, k1, k2: 1/(l**2)*np.exp(2*np.pi*1j/l*(t1*k1+t2*k2)),(l,l,l,l))
     # ift_tensor_matricized = np.fromfunction(lambda t, k: 1/(l**2)*np.exp(2*np.pi*1j/l*((t%l)*(k//l)+(t//l)*(k%l))),(l,l))
@@ -50,169 +139,3 @@ def cs_reconstruct_2d(sig_sampled,sampling_matricized,delta):
     prob = cp.Problem(objective, constraints)
     result = prob.solve(verbose=True)
     return x.value
-
-def sampling_matrix(sampling_mask):
-    '''rectangular sampling matrix from a vector 0 or 1 sampling mask'''
-    sampling_mat = np.array([row for row in np.diag(sampling_mask) if np.sum(row) == True])
-    return sampling_mat
-
-def vectorization(matrix):
-    n,m = np.shape(matrix)
-    return np.array([matrix[i//m,i%m] for i in range(n*m)])
-
-def matricization(tensor):
-    a,b,c,d = np.shape(tensor)
-    return np.array([[tensor[j%a,j//a,i//d,i%d] for i in range(c*d)] for j in range(a*b)])
-
-###
-### Classes
-###
-
-class Waveform:
-    def __init__(self,l):
-        self.form = np.array(l)
-        self.size = self.form.size
-        self.shape = self.form.shape
-
-    def real(self):
-        return np.real(self.form)
-    
-    def imag(self):
-        return np.imag(self.form)
-    
-    def ft(self):
-        return Waveform(np.fft.rfft(self.form))
-    
-class Waveform2D(Waveform):
-
-    def ft(self):
-        return Waveform2D(f2axes(np.fft.fft2(self.form)))
-    
-    def n_dir(self):
-        return np.shape(self.form)[0]
-    
-    def n_indir(self):
-        return np.shape(self.form)[1]
-    
-    
-class Signal:
-    def __init__(self,l,delta1=1):
-        self.dt1 = delta1
-        self.timedom = Waveform(l)
-        self.len = self.timedom.shape[0]
-        self.update()
-
-    def update(self):
-        self.freqdom = self.timedom.ft()
-        self.len = np.shape(self.timedom.form)[0]
-    
-    def set_signal(self, signal):
-        self.timedom = Waveform(signal)
-        self.update()
-
-    def add_signal(self, signal):
-        if self.timedom == None:
-            self.set_signal(signal)
-        else:
-            self.timedom.form += np.array(signal)
-            self.update()
-
-    def sparse_sample(self, sampling_mask):
-        sig_s = Signal(self.dt1)
-        sig_p = Signal(self.dt1)
-        sig_s.set_signal(self.timedom.form[sampling_mask>0])
-        sig_p.set_signal(self.timedom.form*sampling_mask)
-        return sig_s, sig_p
-
-    def plot(self, type="time", part = "complex"):
-        if type == "time":
-            if not part == "imag":
-                plt.plot([i*self.dt1 for i in range(self.timedom.size)], self.timedom.real())
-            if not part == "real":
-                plt.plot([i*self.dt1 for i in range(self.timedom.size)], self.timedom.imag())
-            plt.xlabel("[s]")
-            # plt.show()
-        if type == "freq":
-            if not part == "imag":
-                plt.plot([i/self.freqdom.size/self.dt1 for i in range(self.freqdom.size)], self.freqdom.real())
-            if not part == "real":
-                plt.plot([i/self.freqdom.size/self.dt1 for i in range(self.freqdom.size)], self.freqdom.imag())
-            plt.xlabel("[Hz]")
-            # plt.show()
-
-class Signal2D(Signal):
-    def __init__(self,l, delta1=1, delta2=1):
-        self.dt1 = delta1
-        self.dt2 = delta2
-        self.timedom = Waveform2D(l)
-        self.len = self.timedom.shape[0]
-        self.update()
-
-    def set_signal(self, signal):
-        self.timedom = Waveform2D(signal)
-        self.update()
-
-    def direct_slice(self,indirect_t):
-        dir_sl = Signal(self.dt1)
-        dir_sl.set_signal(self.timedom.form[indirect_t,:])
-        return dir_sl
-    
-    def indirect_slice(self,direct_t):
-        dir_sl = Signal(self.dt1)
-        dir_sl.set_signal(self.timedom.form[:,direct_t])
-        return dir_sl
-
-    def sparse_sample(self, sampling_mask):
-        l = np.shape(self.timedom.form)[0]
-        sig_s = Signal2D(self.dt1,self.dt2)
-        sig_p = Signal2D(self.dt1,self.dt2)
-
-        sampl_mat = np.array([row for row in np.diag(vectorization(sampling_mask)) if np.sum(row) == True])
-
-        sig_s_v = np.matmul(sampl_mat,vectorization(self.timedom.form))
-        sig_s_2d = [[sig_s_v[i+l*j] for i in range(l)] for j in range(len(sig_s_v)//l)]
-
-        sig_s.set_signal(sig_s_2d)
-        sig_p.set_signal(self.timedom.form*sampling_mask)
-        return sig_s, sig_p
-
-    def plot_direct(self, indirect_t ,type="time", part = "complex"):
-        print(self.direct_slice(indirect_t).timedom.form)
-        self.direct_slice(indirect_t).plot(type,part)
-
-    def plot2D(self):
-        plt.imshow(self.timedom.real(), interpolation='none')
-        plt.xlabel("direct dimension [%s s]"%self.dt1)
-        plt.ylabel("indirect dimension [%s s]"%self.dt2)
-        # plt.show()
-
-    def freqplot2D(self):
-        fig = plt.figure(figsize=(6, 6))
-
-        # ax1 = fig.add_subplot(projection='3d')
-        # x = np.arange(np.shape(self.timedom.form)[1])/self.len/self.dt1
-        # y = np.arange(self.len)/self.len/self.dt1
-        # x, y = np.meshgrid(x, y)
-        # ax1.plot_surface(x,y,self.freqdom.form,cmap=matplotlib.cm.seismic,linewidth=0,antialiased=True)
-            
-        ax1 = fig.add_subplot()
-        ff = abs(self.freqdom.form)
-        ax1.imshow(ff)
-        plt.xlabel("direct dimension [Hz]")
-        plt.ylabel("indirect dimension [Hz]")
-
-        #     ax1 = fig.add_subplot()
-        #     ff = self.freqdom.form.real
-        #     r = 1-np.heaviside(ff-np.max(ff)*0.05,1)*ff/np.max(ff)
-        #     g = 1-np.heaviside(-ff+np.max(ff)*0.05,1)*ff/np.min(ff)
-        #     b = np.ones(r.shape)
-        #     rgb = np.transpose(np.array([r,g,b]),[1,2,0])
-
-        #     ax1.imshow(rgb)
-
-        #     plt.xlabel("direct dimension [Hz]")
-        #     plt.ylabel("indirect dimension [Hz]")
-
-
-        # plt.imshow(self.freqdom.real(), interpolation='none')
-        plt.show()
