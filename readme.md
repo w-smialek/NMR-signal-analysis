@@ -2,7 +2,7 @@
 
 The simplest examples concern 1D spectrum with time varying frequency.
 If the time over witch the change of frequency takes place is short in some sense, we can focus only on the linear change of frequency with time:
-$$ S_k(t) = A_k \cdot e^{2\pi i \ t \cdot f_k(t) - t/\tau_k} $$
+$$S_k(t) = A_k \cdot e^{2\pi i \ t \cdot f_k(t) - t/\tau_k}$$
 $$f_k(t) = u+w \cdot t$$
 The spectrum of $S_k(t)$ will no longer be a Lorentzian, but instead will contain oscillations in the range of frequencies present in the time signal.
 ![[1d_nonstat_example.png]]
@@ -13,7 +13,7 @@ The corresponding behaviour is observed in 2D spectra. For the real-life spectro
 - Direct time is always fully sampled, with $t_1$ values ordered linearly in real time 
   $t_r$. Indirect time can be sampled in any order we wish.
 - The two-dimensional signal is a sum of signals of the form
-$$ S_k(t_1,t_2; t_r) = A_k \cdot e^{2 \pi i \left(t_1f_{k,1}(t_r)+t_2f_{k,2}(t_r)\right) - t_1/\tau_k}$$
+$$S_k(t_1,t_2; t_r) = A_k \cdot e^{2 \pi i \left(t_1f_{k,1}(t_r)+t_2f_{k,2}(t_r)\right) - t_1/\tau_k}$$
 - The effects of frequency non-stationarity during a single $t_1$ sampling is negligible.
 
 I've recreated the three situations from *"Fast time-resolved NMR with non-uniform sampling"* for a 2D complex signal and spectrum.
@@ -42,8 +42,8 @@ Apart from the differences coming from lack of symmetry compared to the signal u
 ![[indirect_perp_big.png]]
 ## Examples of Compressed Sensing reconstruction
 I've implemented a very simple algorithm for 1D/2D CS reconstruction, using embedded conic solver from CVXPY library. Optimization problem is defined as
-$$\underset{\tilde S_r}{\operatorname{argmin}} \|\tilde S_r\|_1 \ ;\quad \operatorname{mat}(\mathcal{M}\mathcal{F}^{-1}) \cdot \operatorname{vec} (\tilde S_r ) - \operatorname{vec} (S) \leq \delta$$
-Where $\tilde S_r$ is the searched for spectrum, $\operatorname{vec}(\cdot)$ is a vectorization transformation $v^{di +j} = m^i_{\ j}$ for $c\times d$  m matrix or identity for m vector, $\operatorname{mat}(\cdot)$ is the matricization transformation $m^{bi+j}_{\ \ dk+l} = t^{ij}_{\ \ kl}$ for $a\times b \times c \times d$ tensor or identity for t matrix, $\mathcal{F}$ is a Fourier transform operator (rank 4 tensor or matrix) and $\mathcal{M}$ is a sampling operator, which projects the full signal onto the subspace of sampled points of $S$.
+$$\underset{\tilde S_r}{\text{argmin}} \|\tilde S_r\|_1 \ ;\quad \text{mat}(\mathcal{M}\mathcal{F}^{-1}) \cdot \text{vec} (\tilde S_r ) - \text{vec} (S) \leq \delta$$
+Where $\tilde S_r$ is the searched for spectrum, $\text{vec}(\cdot)$ is a vectorization transformation $v^{di +j} = m^i_{\ j}$ for $c\times d$  m matrix or identity for m vector, $\text{mat}(\cdot)$ is the matricization transformation $m^{bi+j}_{\ \ dk+l} = t^{ij}_{\ \ kl}$ for $a\times b \times c \times d$ tensor or identity for t matrix, $\mathcal{F}$ is a Fourier transform operator (rank 4 tensor or matrix) and $\mathcal{M}$ is a sampling operator, which projects the full signal onto the subspace of sampled points of $S$.
 
 The basic convex optimization handles small-sized problems well, but is inefficient for larger signals.
 
