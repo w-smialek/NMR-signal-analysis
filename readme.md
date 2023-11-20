@@ -28,18 +28,18 @@ The permutation is drawn from a uniform distribution of 1024-elements permutatio
 
 The direct time frequency $f_1$ changes with $t_r$, while the indirect time frequency $f_2$ is stationary. Simulated signal was of the form
 $$S(t_1,t_2;t_r) = e^{2\pi i ((50+10\frac{t_r}{1024})t_1+100t_2)-t_1/256} $$
-![[direct_lin.png]]
-![[direct_perp.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/direct_lin.png)
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/direct_perp.png)
 The indirect time frequency $f_2$ changes with $t_r$, while the direct time frequency $f_1$ is stationary. Simulated signal was of the form
 $$S(t_1,t_2;t_r) = e^{2\pi i (50t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
-![[indirect_lin.png]]
-![[indirect_perp.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_lin.png)
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_perp.png)
 Both frequencies change with $t_r$
 $$S(t_1,t_2;t_r) = e^{2\pi i ((50+10\frac{t_r}{1024})t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
-![[both_lin.png]]
-![[coolwyszlo 1.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/both_lin.png)
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/coolwyszlo 1.png)
 Apart from the differences coming from lack of symmetry compared to the signal used in *"Fast time-resolved NMR with non-uniform sampling"*, I have noticed a much bigger range of artifacts in spectrum coming from non-stationarity of $f_2$  than $f_1$ in the mode $t_2 \perp t_r$ . For a slightly larger non-stationarity, than presented above, the artifacts completely dominate. Here with $f_1(t_r)=\text{const} = 50, \ f_2(t_r) = 100 + 10t_r$ :
-![[indirect_perp_big.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_perp_big.png)
 ## Examples of Compressed Sensing reconstruction
 I've implemented a very simple algorithm for 1D/2D CS reconstruction, using embedded conic solver from CVXPY library. Optimization problem is defined as $$\underset{\tilde S_r}{\text{argmin}} \|\tilde S_r\|_1 \ ;\quad \text{mat}(\mathcal{M}\mathcal{F}^{-1}) \cdot \text{vec} (\tilde S_r ) - \text{vec} (S) \leq \delta$$,
 Where $\tilde S_r$ is the searched for spectrum, $\text{vec}(\cdot)$ is a vectorization transformation $v^{di +j} = m^i_{\ j}$ for $c\times d$  m matrix or identity for m vector, $\text{mat}(\cdot)$ is the matricization transformation $m^{bi+j}_{\ \ dk+l} = t^{ij}_{\ \ kl}$ for $a\times b \times c \times d$ tensor or identity for t matrix, $\mathcal{F}$ is a Fourier transform operator (rank 4 tensor or matrix) and $\mathcal{M}$ is a sampling operator, which projects the full signal onto the subspace of sampled points of $S$.
@@ -52,15 +52,15 @@ Plot shows a real part of the spectrum of the original (up) and the reconstructe
 1D signal is of the form: $S(t) = e^{2\pi i \ 0.4 t - \frac{t}{256}} + \frac{1}{2} e^{2\pi i \ 0.7 t - \frac{t}{256}}$ , with added complex gaussian noise $\sigma = 0.3$ , 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
 
 The original signal:
-![[1d_rec_orig.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_orig.png)
 The reconstruction:
-![[1d_rec_rec.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_rec.png)
 2D signal is of the form: $S(t) = e^{2\pi i (0.1 t_1 + 0.2 t_2) - \frac{t}{20}} + \frac{1}{2} e^{2\pi i (0.3 t_1 + 0.6 t_2) - \frac{t}{20}}+ \frac{1}{4} e^{2\pi i (0.5 t_1 + 0.5 t_2) - \frac{t}{20}}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
 
 The original signal:
-![[2d_rec_orig 1.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_orig 1.png)
 The reconstruction:
-![[2d_rec_rec 1.png]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_rec 1.png)
 ## Non - uniform sampling vs non-stationarity compromise
 
 For non-uniformly sampled signals with non-stationary frequency, both the degree of non-stationarity and the loss of information in NUS create artifacts in the resulting spectrum.
@@ -73,20 +73,20 @@ For a signal $S(t_1;t_r) = 2e^{2\pi i (0.2 + \theta \frac{t_r}{512})t_1 - \frac{
 There is a compromise between NUS and non-stationarity. Faster change of frequency lowers the optimal ratio, while bigger amount of noise increases it. 
 
 Simulation with $\theta = 0.01$ : 
-![[1d_compromise_1.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_1.gif)
 Simulation with $\theta = 0.02$ : 
-![[1d_compromise_2.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_2.gif)
 Simulation with $\theta = 0.03$ : 
-![[1d_compromise_3 1.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_3 1.gif)
 Similar simulation was performed with 2D spectra.
 $S(t_1,t_2; t_r) = 2e^{2 \pi i ((0.2 + \theta \frac{t_r}{40})t_1 + (0.4 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}} + e^{2 \pi i ((0.6 + \theta \frac{t_r}{40})t_1 + (0.3 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}}$
 $40\times40$ sampling points, $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac{1}{40}$, plus gaussian noise $\sigma = 0.3$ .
 In 2D spectrum I have again observed, that the effects of non-stationarity strongly dominated and very low sampling ratios was favorable.
 
 Simulation with $\theta = 0.02$ :
-![[2d_compromise_2.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_compromise_2.gif)
 Simulation with $\theta = 0.03$ :
-![[2d_compromise_3.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_compromise_3.gif)
 ## Time-resolved non-uniform sampling
 
 The combination of NUS and shuffled schedule of signal acquisition can be used in 2D spectroscopy to investigate time dependence of resonant frequencies during a process happening in real-time, like a change of temperature or an ongoing chemical reaction.
@@ -95,4 +95,4 @@ The spectra can then be grouped and formed into multiple non-uniformly sampled 2
 
 A signal of the form $S(t_1,t_2;t_r) = e^{2 \pi i ((0.20+0.025 t_r/n)t_1 + (0.4+0.015t_r/n)t_2)}$ (without the decay or gaussian noise) with $n=40$ , $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac 1 n$ was simulated. 250 1D spectra with random $t_2$'s have been obtained and grouped into 30 2D spectra, with a sampling ratio of 20% for each.
 Each 2D spectrum was reconstructed using CS and plotted. The image shows, how the resonant peak shifts from $(8 \ \text{Hz},16 \ \text{Hz})$ to $(14.25 \ \text{Hz}, 19.75 \ \text{Hz})$ in time range $t_r \in [0,250 \Delta t_r]$. The artifacts, that can be attributed to non-stationarity are still visible.
-![[2d_TS1.gif]]
+![](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_TS1.gif)
