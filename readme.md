@@ -77,7 +77,7 @@ Simulation with $\theta = 0.01$ :
 Simulation with $\theta = 0.02$ : 
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_2.gif)
 Simulation with $\theta = 0.03$ : 
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_3 1.gif)
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_3_1.gif)
 Similar simulation was performed with 2D spectra.
 $S(t_1,t_2; t_r) = 2e^{2 \pi i ((0.2 + \theta \frac{t_r}{40})t_1 + (0.4 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}} + e^{2 \pi i ((0.6 + \theta \frac{t_r}{40})t_1 + (0.3 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}}$
 $40\times40$ sampling points, $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac{1}{40}$, plus gaussian noise $\sigma = 0.3$ .
