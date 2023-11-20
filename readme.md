@@ -58,9 +58,9 @@ The reconstruction:
 2D signal is of the form: $S(t) = e^{2\pi i (0.1 t_1 + 0.2 t_2) - \frac{t}{20}} + \frac{1}{2} e^{2\pi i (0.3 t_1 + 0.6 t_2) - \frac{t}{20}}+ \frac{1}{4} e^{2\pi i (0.5 t_1 + 0.5 t_2) - \frac{t}{20}}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
 
 The original signal:
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_orig 1.png)
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_orig1.png)
 The reconstruction:
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_rec 1.png)
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_rec1.png)
 ## Non - uniform sampling vs non-stationarity compromise
 
 For non-uniformly sampled signals with non-stationary frequency, both the degree of non-stationarity and the loss of information in NUS create artifacts in the resulting spectrum.
