@@ -37,7 +37,7 @@ $$S(t_1,t_2;t_r) = e^{2\pi i (50t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
 Both frequencies change with $t_r$
 $$S(t_1,t_2;t_r) = e^{2\pi i ((50+10\frac{t_r}{1024})t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/both_lin.png)
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/coolwyszlo 1.png)
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_lin1.png)
 Apart from the differences coming from lack of symmetry compared to the signal used in *"Fast time-resolved NMR with non-uniform sampling"*, I have noticed a much bigger range of artifacts in spectrum coming from non-stationarity of $f_2$  than $f_1$ in the mode $t_2 \perp t_r$ . For a slightly larger non-stationarity, than presented above, the artifacts completely dominate. Here with $f_1(t_r)=\text{const} = 50, \ f_2(t_r) = 100 + 10t_r$ :
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_perp_big.png)
 ## Examples of Compressed Sensing reconstruction
