@@ -43,7 +43,7 @@ Apart from the differences coming from lack of symmetry compared to the signal u
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_perp_big.png)
 ## Examples of Compressed Sensing reconstruction
 I've implemented a very simple algorithm for 1D/2D CS reconstruction, using embedded conic solver from CVXPY library. Optimization problem is defined as $$\underset{\tilde S_r}{\text{argmin}} \lVert \tilde{S_r} \rVert_1 ; \quad \text{mat}(\mathcal{M}\mathcal{F}^{-1}) \cdot \text{vec} (\tilde S_r ) - \text{vec} (S) \leq \delta$$,
-Where $\tilde{S_r}$ is the searched for spectrum, $\text{vec}(\cdot)$ is a vectorization transformation $v^{di +j} = m^i_{j}$ for $c\times d$  m matrix or identity for m vector, $\text{mat}(\cdot)$ is the matricization transformation $m^{bi+j}_{dk+l} = t^{ij}_{kl}$ for $a\times b \times c \times d$ tensor or identity for t matrix, $\mathcal{F}$ is a Fourier transform operator (rank 4 tensor or matrix) and $\mathcal{M}$ is a sampling operator, which projects the full signal onto the subspace of sampled points of $S$.
+Where $\tilde{S_r}$ is the searched for spectrum, $\text{vec}(\cdot)$ is a vectorization transformation $v^{di +j} = m^i_{j}$ for $c\times d$  m matrix or identity for m vector, $\text{mat}(\cdot)$ is the matricization transformation ${m^{bi+j}}_{dk+l} = {t^{ij}}_{kl}$ for $a\times b \times c \times d$ tensor or identity for t matrix, $\mathcal{F}$ is a Fourier transform operator (rank 4 tensor or matrix) and $\mathcal{M}$ is a sampling operator, which projects the full signal onto the subspace of sampled points of $S$.
 
 The basic convex optimization handles small-sized problems well, but is inefficient for larger signals.
 
