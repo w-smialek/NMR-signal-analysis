@@ -107,3 +107,8 @@ The spectra can then be grouped and formed into multiple non-uniformly sampled 2
 A signal of the form $S(t_1,t_2;t_r) = e^{2 \pi i ((0.20+0.025 t_r/n)t_1 + (0.4+0.015t_r/n)t_2)}$ (without the decay or gaussian noise) with $n=40$ , $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac 1 n$ was simulated. 250 1D spectra with random $t_2$'s have been obtained and grouped into 30 2D spectra, with a sampling ratio of 20% for each.
 Each 2D spectrum was reconstructed using CS and plotted. The image shows, how the resonant peak shifts from $(8 \ \text{Hz},16 \ \text{Hz})$ to $(14.25 \ \text{Hz}, 19.75 \ \text{Hz})$ in time range $t_r \in [0,250 \Delta t_r]$. The artifacts, that can be attributed to non-stationarity are still visible.
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_TS1.gif)
+
+## Radon transform
+
+[Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
+[Interactive 3d plot of radon transform](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/rt_density.html)
