@@ -110,7 +110,7 @@ Each 2D spectrum was reconstructed using CS and plotted. The image shows, how th
 
 ## Radon transform
 
-Determining both frequency and its rate of change with some external parameter (typically a function of real time) is possible using the Discrete Radon Transform of a spectrum. Suppose, that we have acquired a series of one dimensional spectra with varying external parameter $t_r$: $\hat{S}(f;t_r=0), \ \hat{S}(f;t_r=\Delta t_r), \cdots, \hat{S}(f;t_r=N\Delta t_r)$.
+Determining both frequency and its rate of change in real time or some external parameter is possible using the Discrete Radon Transform of a spectrum. Suppose, that we have acquired a series of one dimensional spectra with varying external parameter $t_r$: $\hat{S}(f;t_r=0), \ \hat{S}(f;t_r=\Delta t_r), \cdots, \hat{S}(f;t_r=N\Delta t_r)$.
 Then, the Discrete Radon Transform of $\hat{S}(f,t_r)$ is defined as
 $$R\hat{S}(f,\bar{f}) = \sum_{s=0}^{N} \hat{S}(f+s\bar{f};s)$$
 The value of $R\hat{S}(f_0,\bar{f})$ at a particular point is interpreted as an amplitude for the presence of oscillations with $t_r$-dependent frequency $f_0+\bar{f}t_r$ in the original signal.
