@@ -124,8 +124,10 @@ $$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \sum_{s=0}^{N} \hat{S}(f_1+s\bar{f}_1,
 A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((0.25+0.005t_r)t_1 + 0.5 t_2)}$ with $n=100$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,\Delta t_1, \cdots, n \Delta t_1)$ was generated and each constant - $t_r$ signal was Fourier transformed. 
 Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
+
 [Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
-3D is pretty much the highest dimension we can conveniently visualize, but
-For the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$:
+
+3D is the highest dimension that can be conveniently visualized, but
+for the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
 [Interactive 3d plot of radon transform](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/rt_density.html)
