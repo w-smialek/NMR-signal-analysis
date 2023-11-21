@@ -110,11 +110,22 @@ Each 2D spectrum was reconstructed using CS and plotted. The image shows, how th
 
 ## Radon transform
 
+Determining both frequency and its rate of change with some external parameter (typically a function of real time) is possible using the Discrete Radon Transform of a spectrum. Suppose, that we have acquired a series of one dimensional spectra with varying external parameter $t_r$: $\hat{S}(f;t_r=0), \ \hat{S}(f;t_r=\Delta t_r), \cdots, \hat{S}(f;t_r=N\Delta t_r)$.
+Then, the Discrete Radon Transform of $\hat{S}(f,t_r)$ is defined as
+$$R\hat{S}(f,\bar{f}) = \sum_{s=0}^{N} \hat{S}(f+s\bar{f};s)$$
+The value of $R\hat{S}(f_0,\bar{f})$ at a particular point is interpreted as an amplitude for the presence of oscillations with $t_r$-dependent frequency $f_0+\bar{f}t_r$ in the original signal.
+Series of signals $S(t;t_r) = e^{2\pi i (0.5+0.3t_r) t}$ with $n=100$ , $\Delta t = \frac 1 n$ , $t_r = (0,\Delta t, \cdots, n \Delta t)$ was generated and each constant-$t_r$ signal was Fourier transformed. Image shows the plot of a real part of $\hat{S}(f;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_1d.png)
+In the plot of the absolute value of Radon Transform $|R\hat{S}(f;\bar{f})|$ we see a peak at $(f,\bar{f}) = (50,0.3)$, corresponding to the correct frequency an its rate of change
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_1d.png)
+
+Radon transform generalizes into higher dimension and for a series of 2D spectra with single varying external parameter $t_r$, it will be a function of four variables, i.e. it is a function on a 4D space of lines in 3D real space:
+$$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \sum_{s=0}^{N} \hat{S}(f_1+s\bar{f}_1,f_2+s\bar{f}_2;s)$$
+A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((0.25+0.005t_r)t_1 + 0.5 t_2)}$ with $n=100$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,\Delta t_1, \cdots, n \Delta t_1)$ was generated and each constant-$t_r$ signal was Fourier transformed. 
+Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
-
 [Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
-
+3D is pretty much the highest dimension we can conveniently visualize, but
+For the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$:
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
 [Interactive 3d plot of radon transform](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/rt_density.html)
