@@ -113,7 +113,7 @@ Each 2D spectrum was reconstructed using CS and plotted. The image shows, how th
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_1d.png)
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_1d.png)
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
-![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_2d.png)
+![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
 
 [Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
 
