@@ -120,7 +120,7 @@ In the plot of the absolute value of Radon Transform $|R\hat{S}(f;\bar{f})|$ we 
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_1d.png)
 
 Radon transform generalizes into higher dimension and for a series of 2D spectra with single varying external parameter $t_r$, it will be a function of four variables, i.e. it is a function on a 4D space of lines in 3D real space:
- $$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \overset{N}{\underset{s=0}{\sum}^{N}} \hat{S}(f_1+s\bar{f}_1,f_2+s\bar{f}_2;s)$$ 
+ $$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \overset{N}{\underset{s=0}{\sum}} \hat{S}(f_1+s\bar{f}_1,f_2+s\bar{f}_2;s)$$ 
 A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((0.25+0.005t_r)t_1 + 0.5 t_2)}$ with $n=100$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,\Delta t_1, \cdots, n \Delta t_1)$ was generated and each constant - $t_r$ signal was Fourier transformed. 
 Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
