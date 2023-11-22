@@ -122,12 +122,14 @@ In the plot of the absolute value of Radon Transform $|R\hat{S}(f;\bar{f})|$ we 
 Radon transform generalizes into higher dimension and for a series of 2D spectra with single varying external parameter $t_r$, it will be a function of four variables, i.e. it is a function on a 4D space of lines in 3D real space:
  $$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \overset{N}{\underset{s=0}{\sum}} \hat{S}(f_1+s\bar{f}_1,f_2+s\bar{f}_2;s)$$ 
 A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((10+0.2t_r)t_1 + 20 t_2)}$ with $n=40$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,1, \cdots, n )$ was generated and each constant- $t_r$ signal was Fourier transformed. 
-Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$:
+Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$.
+X axis - $f_1$, Y axis - $f_2$, Z axis - $t_r$
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
 
 [Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
 
 3D is the highest dimension that can be conveniently visualized, but
-for the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$:
+for the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$.
+X axis - $f_1$, Y axis - $f_2$, Z axis - $\bar{f}_1$
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
 [Interactive 3d plot of radon transform](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/rt_density.html)
