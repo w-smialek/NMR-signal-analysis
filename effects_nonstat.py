@@ -12,7 +12,7 @@ n = 100
 
 ## 1D
 
-form  = [1*np.exp(2j*pi*(0.1+0.05*t**2/n**2)*t - t/(n/2)) for t in range(n)]
+form  = [1*np.exp(2j*pi*(0.1+0.05*t/n)*t - t/(n/2)) for t in range(n)]
 noise = sig.whitenoise_complex(0.1,n)
 
 sig_1D_nonstat = sig.Signal(form)

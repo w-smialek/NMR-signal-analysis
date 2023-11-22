@@ -9,19 +9,19 @@ frate = 0.3
 
 form = np.array([[np.exp(2j*pi*(f0 + frate*tr/n)*t) for t in range(n)] for tr in range(n)])
 sig1 =  sig.Signal(form)
-sig1.plot("time")
-plt.show()
+# sig1.plot("time")
+# plt.show()
 
 fts = np.array([np.fft.fft(form[i,:]) for i in range(n)])
 plt.matshow(abs(fts))
-plt.savefig("ft_series_1d.png",dpi=300)
-plt.show()
+# plt.savefig("ft_series_1d.png",dpi=300)
+# plt.show()
 
 rt = np.array([[np.sum([fts[s,int((om1+om2*s))%n] for s in range(n)]) for om1 in range(n)]for om2 in np.linspace(0,1,100)])
 
 plt.matshow(abs(rt))
-plt.savefig("rt_1d.png",dpi=300)
-plt.show()
+# plt.savefig("rt_1d.png",dpi=300)
+# plt.show()
 
 ###
 ### 2D
@@ -59,8 +59,9 @@ print(np.max(rt_3d))
 import plotly.graph_objects as go
 import numpy as np
 
-X, Y, Z = np.mgrid[ 0:n, 0:n, 0:n]
 values=abs(rt_3d)
+
+X, Y, Z = np.mgrid[ 0:n, 0:n, 0:0.4:40j]
 
 fig = go.Figure(data=go.Isosurface(
     x=X.flatten(),
@@ -78,6 +79,8 @@ fig.write_html("rt_density.html")
 fig.show()
 
 values=abs(sig_3d)
+
+X, Y, Z = np.mgrid[ 0:n, 0:n, 0:n]
 
 fig = go.Figure(data=go.Isosurface(
     x=X.flatten(),
