@@ -130,7 +130,7 @@ X axis - $f_1$, Y axis - $f_2$, Z axis - $t_r$
 [Interactive 3d plot of the series of 2d spectra](https://raw.githack.com/w-smialek/NMR-signal-analysis/main/ft_series_2d.html)
 
 3D is the highest dimension that can be conveniently visualized, but
-for the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$.
+for the signal with stationary $f_2$ , we can set $\bar{f}_2=0$ and determine correct initial frequencies in both dimensions as well as the rate of change of frequency in the first dimension from the 3D spectrum $|R\hat{S}(f_1,f_2;\bar{f}_1,\bar{f}_2 = 0)|$. Peak is visible roughly at the expected point $(f_1=10,f_2=20,\bar{f}_1 = 0.2)$
 
 X axis - $f_1$, Y axis - $f_2$, Z axis - $\bar{f}_1$
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_density.png)
