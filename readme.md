@@ -2,11 +2,11 @@
 
 The simplest examples concern 1D spectrum with time varying frequency.
 If the time over witch the change of frequency takes place is short in some sense, we can focus only on the linear change of frequency with time:
-$$S_k(t) = A_k \cdot e^{2\pi i \ t \cdot f_k(t) - t/\tau_k}$$
-$$f_k(t) = u+w \cdot t$$
-The spectrum of $S_k(t)$ will no longer be a Lorentzian, but instead will contain oscillations in the range of frequencies present in the time signal.
+$$S(t) = A \cdot e^{2\pi i \ t \cdot f(t) - t/\tau}$$
+$$f(t) = u+w \cdot t$$
+The spectrum of $S(t)$ will no longer be a Lorentzian, but instead will contain oscillations in the range of frequencies present in the time signal.
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//1d_nonstat_example.png)
-Image shows the real part of the Discrete Fourier Transform of a signal $S_k(t) = e^{2\pi i\cdot(50+2.5\frac{t}{512})t - t/0.5}$ plus a complex white noise with variance 0.1, with 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
+Image shows the real part of the Discrete Fourier Transform of a signal $S(t) = e^{2\pi i\cdot(50+2.5\frac{t}{512})t - t/0.5}$ plus a complex white noise with variance 0.1, with 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
 
 The corresponding behaviour is observed in 2D spectra. For the real-life spectroscopy experiment, we assume the following setting:
 - There is a series of 1D direct time $t_1$ signals registered, with varying indirect time value $t_2$. 
