@@ -6,7 +6,7 @@ $$S(t) = A \cdot e^{2\pi i \ t \cdot f(t) - t/\tau}$$
 $$f(t) = u+w \cdot t$$
 The spectrum of $S(t)$ will no longer be a Lorentzian, but instead will contain oscillations in the range of frequencies present in the time signal.
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//1d_nonstat_example.png)
-Image shows the real part of the Discrete Fourier Transform of a signal $S(t) = e^{2\pi i\cdot(50+2.5t)t - \frac{t}{256}}$ plus a complex white noise with variance 0.1, with 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
+Image shows the real part of the Discrete Fourier Transform of a signal $S(t) = e^{2\pi i\cdot(51+2.5t)t - 2 t}$ plus a complex white noise with variance 0.1, with 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
 
 The corresponding behaviour is observed in 2D spectra. For the real-life spectroscopy experiment, we assume the following setting:
 - There is a series of 1D direct time $t_1$ signals registered, with varying indirect time value $t_2$. 
@@ -27,21 +27,21 @@ The permutation is drawn from a uniform distribution of 1024-elements permutatio
 #### Non-stationarity of direct time frequency $f_1$
 
 The direct time frequency $f_1$ changes with $t_r$, while the indirect time frequency $f_2$ is stationary. Simulated signal was of the form
-$$S(t_1,t_2;t_r) = e^{2\pi i ((50+10\frac{t_r}{1024})t_1+100t_2)-t_1/256} $$
+$$S(t_1,t_2;t_r) = e^{2\pi i ((51+10t_r)t_1+102t_2)-4 t_1} $$
 
 Linear schedule:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/direct_lin.png)
 Shuffled schedule:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/direct_perp.png)
 The indirect time frequency $f_2$ changes with $t_r$, while the direct time frequency $f_1$ is stationary. Simulated signal was of the form
-$$S(t_1,t_2;t_r) = e^{2\pi i (50t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
+$$S(t_1,t_2;t_r) = e^{2\pi i (51 t_1 + (102+2.5t_r) t_2)-4 t_1}$$
 
 Linear schedule:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_lin.png)
 Shuffled schedule:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/indirect_perp.png)
 Both frequencies change with $t_r$
-$$S(t_1,t_2;t_r) = e^{2\pi i ((50+10\frac{t_r}{1024})t_1+(100+2.5\frac{t_r}{1024})t_2)-t_1/256} $$
+$$S(t_1,t_2;t_r) = e^{2\pi i ((51+10t_r)t_1+(102+2.5t_r)t_2)-4 t_1} $$
 
 Linear schedule:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/both_lin.png)
@@ -66,7 +66,7 @@ The original signal:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_orig.png)
 The reconstruction:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_rec.png)
-2D signal is of the form: $S(t) = e^{2\pi i (4 t_1 + 8 t_2) - \frac{t}{20}} + \frac{1}{2} e^{2\pi i (12 t_1 + 24 t_2) - \frac{t}{20}}+ \frac{1}{4} e^{2\pi i (20 t_1 + 20 t_2) - \frac{t}{20}}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
+2D signal is of the form: $S(t_1,t_2) = e^{2\pi i (4 t_1 + 8 t_2) - 2 t_1} + \frac{1}{2} e^{2\pi i (12 t_1 + 24 t_2) - 2t_1}+ \frac{1}{4} e^{2\pi i (20 t_1 + 20 t_2) - 2 t_1}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
 
 The original signal:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_orig1.png)
@@ -80,7 +80,7 @@ the shuffled schedule with non-uniform sampling may allow us to reconstruct the 
 Lowering the number of sampled points, however, itself introduces more artifacts because of the data loss.
 I have simulated the effect of changing the ratio of sampled points on the reconstructed spectrum.
 
-For a signal $S(t_1;t_r) = 2e^{2\pi i (102 + \theta t_r)t_1 - \frac{t_1}{170}} + e^{2\pi i (256 + \theta t_r)t_1 - \frac{t_1}{170}}$ with 512 sampling points, $\Delta t_1 = \Delta t_r = \frac{1}{512}$ plus gaussian noise $\sigma = 0.3$. The gifs show results of spectrum reconstruction for increasing sampling ratios $10\%, \ 20 \%, \cdots, 100\%$ and for three different values of frequency rate of change $\theta$. Schedule $t_1 \perp t_r$ was used. Lower sampling ratio means that less real time have passed during signal acquisition.
+For a signal $S(t_1;t_r) = 2e^{2\pi i (102 + \theta t_r)t_1 - 4 t_1} + e^{2\pi i (256 + \theta t_r)t_1 - 4 t_1}$ with 512 sampling points, $\Delta t_1 = \Delta t_r = \frac{1}{512}$ plus gaussian noise $\sigma = 0.3$. The gifs show results of spectrum reconstruction for increasing sampling ratios $10\%, \ 20 \%, \cdots, 100\%$ and for three different values of frequency rate of change $\theta$. Schedule $t_1 \perp t_r$ was used. Lower sampling ratio means that less real time have passed during signal acquisition.
 There is a compromise between NUS and non-stationarity. Faster change of frequency lowers the optimal ratio, while bigger amount of noise increases it. 
 
 Simulation with $\theta = 0.01$ : 
@@ -90,7 +90,7 @@ Simulation with $\theta = 0.02$ :
 Simulation with $\theta = 0.03$ : 
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_3_1.gif)
 Similar simulation was performed with 2D spectra.
-$S(t_1,t_2; t_r) = 2e^{2 \pi i ((8 + \theta t_r)t_1 + (16 + \theta t_r)t_2) - \frac{t_1}{40}} + e^{2 \pi i ((24 + \theta t_r)t_1 + (12 + \theta t_r)t_2) - \frac{t_1}{40}}$
+$S(t_1,t_2; t_r) = 2e^{2 \pi i ((8 + \theta t_r)t_1 + (16 + \theta t_r)t_2) - t_1} + e^{2 \pi i ((24 + \theta t_r)t_1 + (12 + \theta t_r)t_2) - t_1}$
 $40\times40$ sampling points, $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac{1}{40}$, plus gaussian noise $\sigma = 0.3$ .
 In 2D spectrum I have again observed, that the effects of non-stationarity strongly dominated and very low sampling ratios was favorable.
 
