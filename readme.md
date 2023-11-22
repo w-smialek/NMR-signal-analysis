@@ -60,13 +60,13 @@ The basic convex optimization handles small-sized problems well, but is ineffici
 In the following two examples, spectrum has been reconstructed from a 10% subsample of datapoints.
 
 Plot shows a real part of the spectrum of the original (up) and the reconstructed (down) signals. 
-1D signal is of the form: $S(t) = e^{2\pi i \ 0.4 t - \frac{t}{256}} + \frac{1}{2} e^{2\pi i \ 0.7 t - \frac{t}{256}}$ , with added complex gaussian noise $\sigma = 0.3$ , 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
+1D signal is of the form: $S(t) = e^{2\pi i \ 205 t - \frac{t}{256}} + \frac{1}{2} e^{2\pi i \ 358 t - \frac{t}{256}}$ , with added complex gaussian noise $\sigma = 0.3$ , 512 sampling points and sampling rate $\Delta t = \frac {1}{512} \text{s}$
 
 The original signal:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_orig.png)
 The reconstruction:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_rec_rec.png)
-2D signal is of the form: $S(t) = e^{2\pi i (0.1 t_1 + 0.2 t_2) - \frac{t}{20}} + \frac{1}{2} e^{2\pi i (0.3 t_1 + 0.6 t_2) - \frac{t}{20}}+ \frac{1}{4} e^{2\pi i (0.5 t_1 + 0.5 t_2) - \frac{t}{20}}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
+2D signal is of the form: $S(t) = e^{2\pi i (4 t_1 + 8 t_2) - \frac{t}{20}} + \frac{1}{2} e^{2\pi i (12 t_1 + 24 t_2) - \frac{t}{20}}+ \frac{1}{4} e^{2\pi i (20 t_1 + 20 t_2) - \frac{t}{20}}$ , with added complex gaussian noise $\sigma = 0.2$ , $40\times 40$ sampling points and sampling rate $\Delta t_1 = \Delta t_2 = \frac {1}{40} \text{s}$
 
 The original signal:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_rec_orig1.png)
@@ -80,7 +80,7 @@ the shuffled schedule with non-uniform sampling may allow us to reconstruct the 
 Lowering the number of sampled points, however, itself introduces more artifacts because of the data loss.
 I have simulated the effect of changing the ratio of sampled points on the reconstructed spectrum.
 
-For a signal $S(t_1;t_r) = 2e^{2\pi i (0.2 + \theta \frac{t_r}{512})t_1 - \frac{t_r}{170}} + e^{2\pi i (0.5 + \theta \frac{t_r}{512})t_1 - \frac{t_r}{170}}$ with 512 sampling points, $\Delta t_1 = \Delta t_r = \frac{1}{512}$ plus gaussian noise $\sigma = 0.3$. The gifs show results of spectrum reconstruction for increasing sampling ratios $10\%, \ 20 \%, \cdots, 100\%$ and for three different values of frequency rate of change $\theta$. Schedule $t_1 \perp t_r$ was used. Lower sampling ratio means that less real time have passed during signal acquisition.
+For a signal $S(t_1;t_r) = 2e^{2\pi i (102 + \theta t_r)t_1 - \frac{t_1}{170}} + e^{2\pi i (256 + \theta t_r)t_1 - \frac{t_1}{170}}$ with 512 sampling points, $\Delta t_1 = \Delta t_r = \frac{1}{512}$ plus gaussian noise $\sigma = 0.3$. The gifs show results of spectrum reconstruction for increasing sampling ratios $10\%, \ 20 \%, \cdots, 100\%$ and for three different values of frequency rate of change $\theta$. Schedule $t_1 \perp t_r$ was used. Lower sampling ratio means that less real time have passed during signal acquisition.
 There is a compromise between NUS and non-stationarity. Faster change of frequency lowers the optimal ratio, while bigger amount of noise increases it. 
 
 Simulation with $\theta = 0.01$ : 
@@ -90,7 +90,7 @@ Simulation with $\theta = 0.02$ :
 Simulation with $\theta = 0.03$ : 
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/1d_compromise_3_1.gif)
 Similar simulation was performed with 2D spectra.
-$S(t_1,t_2; t_r) = 2e^{2 \pi i ((0.2 + \theta \frac{t_r}{40})t_1 + (0.4 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}} + e^{2 \pi i ((0.6 + \theta \frac{t_r}{40})t_1 + (0.3 + \theta \frac{t_r}{40})t_2) - \frac{t_1}{40}}$
+$S(t_1,t_2; t_r) = 2e^{2 \pi i ((8 + \theta t_r)t_1 + (16 + \theta t_r)t_2) - \frac{t_1}{40}} + e^{2 \pi i ((24 + \theta t_r)t_1 + (12 + \theta t_r)t_2) - \frac{t_1}{40}}$
 $40\times40$ sampling points, $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac{1}{40}$, plus gaussian noise $\sigma = 0.3$ .
 In 2D spectrum I have again observed, that the effects of non-stationarity strongly dominated and very low sampling ratios was favorable.
 
@@ -104,7 +104,7 @@ The combination of NUS and shuffled schedule of signal acquisition can be used i
 First, during of the process, 1D spectra with randomly selected values of indirect time $t_2$ are acquired for as long as the process goes. Its number depends on the duration of the process in real time and the interval between consecutive acquisitions.
 The spectra can then be grouped and formed into multiple non-uniformly sampled 2D spectra with schedule $t_2 \perp t_r$ . Size of the groups can be adjusted, to allow for the best NUS - non-stationarity compromise. The undersampled 2D spectra are reconstructed with Compressed Sensing and a time dependence of resonant frequencies can be observed.
 
-A signal of the form $S(t_1,t_2;t_r) = e^{2 \pi i ((0.20+0.025 t_r/n)t_1 + (0.4+0.015t_r/n)t_2)}$ (without the decay or gaussian noise) with $n=40$ , $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac 1 n$ was simulated. 250 1D spectra with random $t_2$'s have been obtained and grouped into 30 2D spectra, with a sampling ratio of 20% for each.
+A signal of the form $S(t_1,t_2;t_r) = e^{2 \pi i ((8+0.025 t_r)t_1 + (16+0.015t_r)t_2)}$ (without the decay or gaussian noise) with $n=40$ , $\Delta t_1 = \Delta t_2 = \Delta t_r = \frac 1 n$ was simulated. 250 1D spectra with random $t_2$'s have been obtained and grouped into 30 2D spectra, with a sampling ratio of 20% for each.
 Each 2D spectrum was reconstructed using CS and plotted. The image shows, how the resonant peak shifts from $(8 \ \text{Hz},16 \ \text{Hz})$ to $(14.25 \ \text{Hz}, 19.75 \ \text{Hz})$ in time range $t_r \in [0,250 \Delta t_r]$. The artifacts, that can be attributed to non-stationarity are still visible.
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main/2d_TS1.gif)
 
@@ -114,14 +114,14 @@ Determining both frequency and its rate of change in real time or some external 
 Then, the Discrete Radon Transform of $\hat{S}(f,t_r)$ is defined as
 $$R\hat{S}(f,\bar{f}) = \sum_{s=0}^{N} \hat{S}(f+s\bar{f};s)$$
 The value of $R\hat{S}(f_0,\bar{f})$ at a particular point is interpreted as an amplitude for the presence of oscillations with $t_r$-dependent frequency $f_0+\bar{f}t_r$ in the original signal.
-Series of signals $S(t;t_r) = e^{2\pi i (0.5+0.3t_r) t}$ with $n=100$ , $\Delta t = \frac 1 n$ , $t_r = (0,\Delta t, \cdots, n \Delta t)$ was generated and each constant-$t_r$ signal was Fourier transformed. Image shows the plot of a real part of $\hat{S}(f;t_r)$:
+Series of signals $S(t;t_r) = e^{2\pi i (50+30 t_r) t}$ with $n=100$ , $\Delta t = \frac 1 n$ , $t_r = (0,\Delta t, \cdots, n \Delta t)$ was generated and each constant- $t_r$ signal was Fourier transformed. Image shows the plot of a real part of $\hat{S}(f;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_1d.png)
 In the plot of the absolute value of Radon Transform $|R\hat{S}(f;\bar{f})|$ we see a peak at $(f,\bar{f}) = (50,0.3)$, corresponding to the correct frequency an its rate of change
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_1d.png)
 
 Radon transform generalizes into higher dimension and for a series of 2D spectra with single varying external parameter $t_r$, it will be a function of four variables, i.e. it is a function on a 4D space of lines in 3D real space:
  $$R\hat{S}(f_1,f_2,\bar{f}_1,\bar{f}_2) = \overset{N}{\underset{s=0}{\sum}} \hat{S}(f_1+s\bar{f}_1,f_2+s\bar{f}_2;s)$$ 
-A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((0.25+0.005t_r)t_1 + 0.5 t_2)}$ with $n=100$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,\Delta t_1, \cdots, n \Delta t_1)$ was generated and each constant - $t_r$ signal was Fourier transformed. 
+A series of 2D signals $S(t_1,t_2;t_r) = e^{2\pi i ((10+0.2t_r)t_1 + 20 t_2)}$ with $n=40$ , $\Delta t_1 = \Delta t_2 = \frac 1 n$ , $t_r = (0,\Delta t_1, \cdots, n \Delta t_1)$ was generated and each constant- $t_r$ signal was Fourier transformed. 
 Image shows the plot of a real part of $\hat{S}(f_1,f_2;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_2d.png)
 
