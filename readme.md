@@ -114,7 +114,7 @@ Determining both frequency and its rate of change in real time or some external 
 Then, the Discrete Radon Transform of $\hat{S}(f,t_r)$ is defined as
 $$R\hat{S}(f,\bar{f}) = \sum_{s=0}^{N} \hat{S}(f+s\bar{f};s)$$
 The value of $R\hat{S}(f_0,\bar{f})$ at a particular point is interpreted as an amplitude for the presence of oscillations with $t_r$-dependent frequency $f_0+\bar{f}t_r$ in the original signal.
-Series of signals $S(t;t_r) = e^{2\pi i (50+30 t_r) t}$ with $n=100$ , $\Delta t = \frac 1 n$ , $t_r = (0,1, \cdots, n)$ was generated and each constant- $t_r$ signal was Fourier transformed. Image shows the plot of a real part of $\hat{S}(f;t_r)$:
+Series of signals $S(t;t_r) = e^{2\pi i (50+0.3 t_r) t}$ with $n=100$ , $\Delta t = \frac 1 n$ , $t_r = (0,1, \cdots, n)$ was generated and each constant- $t_r$ signal was Fourier transformed. Image shows the plot of a real part of $\hat{S}(f;t_r)$:
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//ft_series_1d.png)
 In the plot of the absolute value of Radon Transform $|R\hat{S}(f;\bar{f})|$ we see a peak at $(f,\bar{f}) = (50,0.3)$, corresponding to the correct frequency an its rate of change
 ![a](https://github.com/w-smialek/NMR-signal-analysis/blob/main//rt_1d.png)
