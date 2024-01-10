@@ -12,7 +12,7 @@ def whitenoise(stdev,n):
 n = 500
 sigma = 0.3
 f = 0.4
-fbar = 0.03
+fbar = 0.01
 # fbar = 0.04
 
 freq = lambda tau: f-fbar*tau/n
@@ -25,6 +25,7 @@ for i in range(n_pieces):
 
 maxes = []
 
+i = 0
 for perm in itertools.permutations(range(n_pieces)):
     sampling = []
     for p in perm:
@@ -37,6 +38,9 @@ for perm in itertools.permutations(range(n_pieces)):
     maxes.append((max(abs(formft)), np.argmax(abs(formft))/n, perm))
     # plt.plot(formft)
     # plt.show()
+    i += 1
+    if (i % 1000) == 0:
+        print(i)
 
 maxes1 = [m[0] for m in maxes]
 maxes2 = [min(m[1],1-m[1]) for m in maxes]
