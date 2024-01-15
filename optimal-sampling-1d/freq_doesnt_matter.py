@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import itertools
+import math
 
 ### Functions
 
@@ -11,13 +12,18 @@ def split(a, n):
 n = 500
 
 def signal(f, fbar, dec, sampling):
-    return [np.cos(2*np.pi*(f + fbar * tau)*t)*np.exp(-t*dec) for t, tau in zip(range(n),sampling)]
+    return [np.exp(2j*np.pi*(f + fbar * tau)*t)*np.exp(-t*dec) for t, tau in zip(range(n),sampling)]
 
-def block_perm_sampling(n_pieces, perm):
-    pieces = [list(i) for i in list(split(range(n), n_pieces))]
+def block_perm_sampling(n_pieces, perm, signs):
+    pieces_forw = [list(i) for i in list(split(range(n), n_pieces))]
+    pieces_backw = [list(i) for i in list(split(range(n-1,-1,-1), n_pieces))]
+    pieces_backw.reverse()
     sampling = []
-    for p in perm:
-        sampling += pieces[p]
+    for p,s in zip(perm,signs):
+        if s:
+            sampling += pieces_forw[p]
+        else:
+            sampling += pieces_backw[p]
     return sampling
 
 def fitness_function(sampling, f, fbar, d_fbar, dec):
@@ -30,12 +36,12 @@ def fitness_function(sampling, f, fbar, d_fbar, dec):
 
 ### Parameters
 
-f = 0.15
-fbar = 0.001/n
+f = 0.2
+fbar = 0.02/n
 dec = 0
 
-n_pieces = 6
-delta_f = 0.0002/n
+n_pieces = 4
+delta_f = fbar/20#0.003/n
 alpha = 0
 
 ### Loop
@@ -49,14 +55,18 @@ indx = 0
 maxes = []
 
 for p in perms:
-    sampling = block_perm_sampling(n_pieces,p)
-    fit_current = fitness_function(sampling,f,fbar,delta_f,dec)
-    maxes.append(fit_current)
+    for s in itertools.product([True,False], repeat=n_pieces):
+        sampling = block_perm_sampling(n_pieces,p,s)
+        fit_current = fitness_function(sampling,f,fbar,delta_f,dec)
+        maxes.append(fit_current)
+        if fit_current > max_all:
+            print(fit_current)
+            max_all = fit_current
+            sampling_max = sampling
     indx+=1
-    if fit_current > max_all:
-        print(fit_current, indx)
-        max_all = fit_current
-        sampling_max = sampling
+    percent = int(indx/(math.factorial(n_pieces))*100)
+    if percent%10 <= 2:
+        print(percent)
 
 ### Plots
 
@@ -74,11 +84,17 @@ plt.plot([max_control for m in maxes])
 plt.show()
 
 # Trivial and optimal sampling spectra
-sig_ft = abs(np.fft.fft(signal(f,fbar,dec,range(n))))
+sig = signal(f,fbar,dec,range(n))
+sig_ft = abs(np.fft.fft(sig))
+plt.plot(sig)
+plt.show()
 plt.plot(sig_ft)
 plt.show()
 
-sig_ft = abs(np.fft.fft(signal(f,fbar,dec,sampling_max)))
+sig = signal(f,fbar,dec,sampling_max)
+sig_ft = abs(np.fft.fft(sig))
+plt.plot(sig)
+plt.show()
 plt.plot(sig_ft)
 plt.show()
 

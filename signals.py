@@ -50,8 +50,8 @@ class Signal():
         self.update()
 
     def plot(self, type="time", **kwargs):
-        fig = plt.figure(figsize=(6, 6))
-        ax1 = fig.add_subplot()
+        # fig = plt.figure(figsize=(6, 6))
+        # ax1 = fig.add_subplot()
         times_axis1 = np.array([self.dt1*i for i in range(self.len)])
         try:
             times_axis2 = np.array([self.dt2*i for i in range(self.timedom.shape[1])])
@@ -90,7 +90,7 @@ class Signal():
                 x = np.arange(np.shape(self.timedom)[1])/self.len/self.dt1
                 y = np.arange(self.len)/self.len/self.dt2
                 x, y = np.meshgrid(x, y)
-                ax1.set_zlim([-10, 1000])
+                ax1.set_zlim([-10, np.max(abs(self.freqdom))])
                 plt.xlabel("direct frequency [Hz]")
                 plt.ylabel("indirect frequency [Hz]")
                 ax1.plot_surface(x,y,abs(self.freqdom),cmap=newcmp,linewidth=0,antialiased=True)
