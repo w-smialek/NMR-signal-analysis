@@ -10,9 +10,9 @@ def exp_sig_sampled(amplitude,frequency,inverse_decay,t_sampling,tau_sampling):
     try:
         result = np.zeros(len(t_sampling))
         for a, f, dec in zip(amplitude,frequency, inverse_decay):
-            result += np.array([a*np.cos(2*np.pi*f(tau)*t - dec*t) for t, tau in zip(t_sampling,tau_sampling)])
+            result += np.array([a*np.cos(2*np.pi*f(tau)*t)*np.exp(-dec*t) for t, tau in zip(t_sampling,tau_sampling)])
     except:
-        result = np.array([amplitude*np.cos(2*np.pi*frequency(tau)*t - inverse_decay*t) for t, tau in zip(t_sampling,tau_sampling)])
+        result = np.array([amplitude*np.cos(2*np.pi*frequency(tau)*t)*np.exp(-inverse_decay*t) for t, tau in zip(t_sampling,tau_sampling)])
     return result
 
 def whitenoise(stdev,n):
@@ -22,7 +22,7 @@ def whitenoise(stdev,n):
 n = 500
 sigma = 0.5
 
-freq1 = lambda tau: 0.40-0.07*tau/n
+freq1 = lambda tau: 0.40-0*tau/n
 freq2 = lambda tau: 0.30-0.01*tau/n
 freq3 = lambda tau: 0.34-0.006*tau/n
 
@@ -32,18 +32,19 @@ dec_used = (0,0)
 
 amplitude_used = 1
 freq_used = freq1
-dec_used = 0
-
+dec_used = 3/n
 
 # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(-n//2,n//2)) + whitenoise(sigma,n)
-form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(0,n))# + whitenoise(sigma,n)
+form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(n))# + whitenoise(sigma,n)
 formft = np.fft.fft(form).real
 
 max_control = max(abs(formft))
 maxarg_control = min(np.argmax(abs(formft))/n, 1- np.argmax(abs(formft))/n)
+plt.plot(form)
+plt.show()
 plt.plot(abs(formft))
-plt.ylim(0,300)
-plt.savefig("./NMR-signal-analysis/optimal-sampling-1d/control.png",dpi=300)
+# plt.ylim(0,300)
+# plt.savefig("./NMR-signal-analysis/optimal-sampling-1d/control.png",dpi=300)
 plt.show()
 
 ###
@@ -126,7 +127,7 @@ plt.plot(sampling_forw)
 plt.show()
 plt.plot(abs(formft))
 plt.ylim(0,300)
-plt.savefig("./NMR-signal-analysis/optimal-sampling-1d/sampling.png",dpi=300)
+# plt.savefig("./NMR-signal-analysis/optimal-sampling-1d/sampling.png",dpi=300)
 plt.show()
 
 ###
