@@ -8,7 +8,7 @@ from numpy import pi
 ## Effects of non-stationary frequency
 ##
 
-n = 100
+n = 200
 
 ## 1D
 
@@ -27,8 +27,8 @@ plt.style.use('ggplot')
 ## 2D
 
 def non_stationary_frequency(t1,t2,treal):
-    f1, f2 = 0.1 + 0.02*treal/n, 0.2 + 0.04*treal/n
-    tau1 = n*10#n/2
+    f1, f2 = 0.1 + 0.07*treal/n, 0.2 + 0.07*treal/n
+    tau1 = n#n/2
     return np.exp(2j*pi*(f1*t1+f2*t2) - t1/tau1)
 
 ###
@@ -49,8 +49,6 @@ def block_perm_sampling(n_pieces, perm, signs):
             sampling += pieces_backw[p]
     return sampling
 
-t_indir = block_perm_sampling(4,[3,2,1,0],4*[True])
-
 def invert_permutation(p):
     """Return an array s with which np.array_equal(arr[p][s], arr) is True.
     The array_like argument p must be some permutation of 0, 1, ..., len(p)-1.
@@ -60,7 +58,8 @@ def invert_permutation(p):
     s[p] = np.arange(p.size)
     return s
 
-t_indir = invert_permutation(t_indir)
+t_indir = block_perm_sampling(4,[3,2,1,0],4*[True])
+
 plt.plot(t_indir)
 plt.show()
 
@@ -113,6 +112,28 @@ for i in range(n_snapshots):
     t_real_interval = (int(treal_interval*i),int(treal_interval*(i+1)))
     # t_indir = np.random.choice(n,int(n*snaphot_sampling_ratio),replace=False)
     ss = sig.Signal(snapshot_2d(n,non_stationary_frequency,range(*t_real_interval),t_indir))
+    ss.freqdom = average_over_neighbours(ss.freqdom)
+    snapshots.append(ss)
+
+maxes = []
+
+for snap in snapshots:
+    # snap.plot(type="time")
+    # snap.plot(type="freq")
+    maxes.append(np.argmax(snap.freqdom))
+
+mm = np.zeros((n,n))
+for m in maxes:
+    mm[(m//n,m%n)] = 1
+
+plt.imshow(mm)
+plt.show()
+
+snapshots = []
+for i in range(n_snapshots):
+    t_real_interval = (int(treal_interval*i),int(treal_interval*(i+1)))
+    # t_indir = np.random.choice(n,int(n*snaphot_sampling_ratio),replace=False)
+    ss = sig.Signal(snapshot_2d(n,non_stationary_frequency,range(*t_real_interval),range(n)))
     ss.freqdom = average_over_neighbours(ss.freqdom)
     snapshots.append(ss)
 
