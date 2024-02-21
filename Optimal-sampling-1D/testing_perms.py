@@ -35,7 +35,7 @@ freq_used = freq1
 dec_used = 3/n
 
 # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(-n//2,n//2)) + whitenoise(sigma,n)
-form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(n))# + whitenoise(sigma,n)
+form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), range(0,n))# + whitenoise(sigma,n)
 formft = np.fft.fft(form).real
 
 max_control = max(abs(formft))
@@ -87,16 +87,16 @@ maxargs = np.zeros((n_tot,n_tot*2))
 for ni in range(n_min,n_tot):
     for nc in range(0,ni):
         sampling_forw = forw_sampling(ni,nc)
-        # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw) + whitenoise(sigma,n)
-        form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw)# + whitenoise(sigma,n)
+        # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw) + whitenoise(sigma,n)
+        form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw)# + whitenoise(sigma,n)
         formft = np.fft.fft(form).real
         maxes[ni,n_tot+1+nc] = max(abs(formft))
         maxargs[ni,n_tot+1+nc] = min(np.argmax(abs(formft))/n, 1- np.argmax(abs(formft))/n)
 # for ni in range(n_min,n_tot):
 #     for nc in range(0,ni):
 #         sampling_backw = backw_sampling(ni,nc)
-#         # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw) + whitenoise(sigma,n)
-#         form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_backw)# + whitenoise(sigma,n)
+#         # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw) + whitenoise(sigma,n)
+#         form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_backw)# + whitenoise(sigma,n)
 #         formft = np.fft.fft(form).real
 #         maxes[ni,n_tot-1-nc] = max(abs(formft))
 #         maxargs[ni,n_tot-1-nc] = min(np.argmax(abs(formft))/n, 1- np.argmax(abs(formft))/n)
@@ -119,7 +119,7 @@ if ni_max[1] > 0:
     sampling_forw = forw_sampling(ni_max[0],ni_max[1]-1)
 else:
     sampling_forw = backw_sampling(ni_max[0],-ni_max[1]-1)
-form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw)# + whitenoise(sigma,n)
+form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw)# + whitenoise(sigma,n)
 formft = np.fft.fft(form).real
 print(max_control,max(abs(formft)))
 
@@ -142,7 +142,7 @@ maxsampling_all = np.random.choice(np.arange(n),n,replace=False)
 
 for i in range(n_trials):
     sampling_current = np.random.choice(np.arange(n),n,replace=False)
-    form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_current)# + whitenoise(sigma,n)
+    form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_current)# + whitenoise(sigma,n)
     formft = np.fft.fft(form).real
     max_current = max(abs(formft))
     if max_current > max_all:
@@ -155,7 +155,7 @@ for i in range(n_trials):
 plt.plot(maxsampling_all)
 plt.show()
 print(max_control, max_all, maxarg_all)
-form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), maxsampling_all)# + whitenoise(sigma,n)
+form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), maxsampling_all)# + whitenoise(sigma,n)
 formft = np.fft.fft(form).real
 plt.plot(formft)
 plt.show()'''
@@ -181,7 +181,7 @@ maxsampling_all = np.random.choice(np.arange(n),n,replace=False)
 
 for i in range(n_trials):
     sampling_current = random_forw_sampling(n_pieces)
-    form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_current)# + whitenoise(sigma,n)
+    form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_current)# + whitenoise(sigma,n)
     formft = np.fft.fft(form).real
     max_current = max(abs(formft))
     if max_current > max_all:
@@ -193,7 +193,7 @@ for i in range(n_trials):
 
 plt.plot(maxsampling_all)
 plt.show()
-form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), maxsampling_all)# + whitenoise(sigma,n)
+form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), maxsampling_all)# + whitenoise(sigma,n)
 formft = np.fft.fft(form).real
 print(max_control, max_all, maxarg_all)
 plt.plot(abs(formft))
@@ -208,8 +208,8 @@ plt.show()'''
 
 # for nc in range(n):
 #     sampling_forw = forw_sampling(n,nc)
-#     # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw) + whitenoise(sigma,n)
-#     form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw)# + whitenoise(sigma,n)
+#     # form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw) + whitenoise(sigma,n)
+#     form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw)# + whitenoise(sigma,n)
 #     formft = np.fft.fft(form).real
 #     maxes.append(max(abs(formft)))
 #     maxargs.append(min(np.argmax(abs(formft))/n, 1- np.argmax(abs(formft))/n))
@@ -223,7 +223,7 @@ plt.show()'''
 # ni_max = np.argmax(maxes)
 
 # sampling_forw = forw_sampling(n,ni_max)
-# form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(-n//2,n//2), sampling_forw)# + whitenoise(sigma,n)
+# form = exp_sig_sampled(amplitude_used, freq_used, dec_used, range(0,n), sampling_forw)# + whitenoise(sigma,n)
 # formft = np.fft.fft(form).real
 # print(max_control,max(abs(formft)))
 

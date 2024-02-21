@@ -21,17 +21,53 @@ sig_1D_nonstat.dt = 1/n
 
 plt.style.use('ggplot')
 
-sig_1D_nonstat.plot("freq", linewidth = 0.8)
-plt.savefig("1d_nonstat_example.png",dpi=300)
+# sig_1D_nonstat.plot("freq", linewidth = 0.8)
+# # plt.savefig("1d_nonstat_example.png",dpi=300)
 
 ## 2D
 
 def non_stationary_frequency(t1,t2,treal):
-    f1, f2 = 0.1, 0.2 + 0.02*treal/n
-    tau1 = n/2
+    f1, f2 = 0.1 + 0.02*treal/n, 0.2 + 0.04*treal/n
+    tau1 = n*10#n/2
     return np.exp(2j*pi*(f1*t1+f2*t2) - t1/tau1)
 
-t_indir = np.random.choice(n,n,replace=False)
+###
+###
+def split(a, n):
+    k, m = divmod(len(a), n)
+    return (a[i*k+min(i, m):(i+1)*k+min(i+1, m)] for i in range(n))
+
+def block_perm_sampling(n_pieces, perm, signs):
+    pieces_forw = [list(i) for i in list(split(range(n), n_pieces))]
+    pieces_backw = [list(i) for i in list(split(range(n-1,-1,-1), n_pieces))]
+    pieces_backw.reverse()
+    sampling = []
+    for p,s in zip(perm,signs):
+        if s:
+            sampling += pieces_forw[p]
+        else:
+            sampling += pieces_backw[p]
+    return sampling
+
+t_indir = block_perm_sampling(4,[3,2,1,0],4*[True])
+
+def invert_permutation(p):
+    """Return an array s with which np.array_equal(arr[p][s], arr) is True.
+    The array_like argument p must be some permutation of 0, 1, ..., len(p)-1.
+    """
+    p = np.asanyarray(p) # in case p is a tuple, etc.
+    s = np.empty_like(p)
+    s[p] = np.arange(p.size)
+    return s
+
+t_indir = invert_permutation(t_indir)
+plt.plot(t_indir)
+plt.show()
+
+###
+###
+
+# t_indir = np.random.choice(n,n,replace=False)
 
 signal_lin = sig.Signal(sig.waveform2(n,non_stationary_frequency,range(n)))
 
@@ -42,11 +78,13 @@ signal_lin.dt1 = signal_lin.dt2 = signal_perp.dt1 = signal_perp.dt2 = 1/(n/2)
 plt.style.use('classic')
 
 signal_lin.plot("freq",cmap="PiYG")
-# plt.savefig("indirect_lin.png",dpi=300)
+# # plt.savefig("indirect_lin.png",dpi=300)
 plt.show()
+plt.close()
 signal_perp.plot("freq",cmap="PiYG")
-plt.savefig("indirect_perp_big.png",dpi=300)
+# plt.savefig("indirect_perp_big.png",dpi=300)
 plt.show()
+plt.close()
 
 ##
 ## Time-resolved NUS
@@ -73,7 +111,7 @@ snaphot_sampling_ratio = treal_interval/n
 snapshots = []
 for i in range(n_snapshots):
     t_real_interval = (int(treal_interval*i),int(treal_interval*(i+1)))
-    t_indir = np.random.choice(n,int(n*snaphot_sampling_ratio),replace=False)
+    # t_indir = np.random.choice(n,int(n*snaphot_sampling_ratio),replace=False)
     ss = sig.Signal(snapshot_2d(n,non_stationary_frequency,range(*t_real_interval),t_indir))
     ss.freqdom = average_over_neighbours(ss.freqdom)
     snapshots.append(ss)
